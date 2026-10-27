@@ -1,0 +1,142 @@
+﻿
+@{
+    ViewBag.Title = "Đăng nhập quản trị";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Đăng nhập quản trị</title>
+
+    @Styles.Render("~/Content/css")
+
+    <style>
+        body {
+            background-color: #f2f4f7;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-container {
+            max-width: 430px;
+            margin: 90px auto;
+            padding: 0 15px;
+        }
+
+        .login-panel {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .login-heading {
+            background-color: #337ab7;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+            .login-heading h2 {
+                font-size: 22px;
+                margin: 0;
+                font-weight: bold;
+            }
+
+        .login-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            height: 42px;
+            border-radius: 4px;
+        }
+
+        .btn-login {
+            width: 100%;
+            height: 42px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .login-footer {
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container login-container">
+        <div class="login-panel">
+
+            <div class="login-heading">
+                <h2>ĐĂNG NHẬP QUẢN TRỊ</h2>
+            </div>
+
+            <div class="login-body">
+
+                @using (Html.BeginForm(
+                    "Login",
+                    "Account",
+                    new { area = "Admin" },
+                    FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <div class="form-group">
+                        <label for="username">Tên đăng nhập</label>
+
+                        <input type="text"
+                               id="username"
+                               name="username"
+                               class="form-control"
+                               placeholder="Nhập tên đăng nhập"
+                               autocomplete="username"
+                               required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               class="form-control"
+                               placeholder="Nhập mật khẩu"
+                               autocomplete="current-password"
+                               required />
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary btn-login">
+                        Đăng nhập
+                    </button>
+                }
+
+                <div class="login-footer">
+                    Hệ thống quản lý cửa hàng MyStore
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

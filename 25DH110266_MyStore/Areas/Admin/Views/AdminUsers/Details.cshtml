@@ -1,0 +1,39 @@
+﻿
+@model _25DH110266_MyStore.Models.User
+
+@{
+    ViewBag.Title = "Chi tiết tài khoản Admin";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+}
+
+<h2>Chi tiết tài khoản Admin</h2>
+<hr />
+
+<dl class="dl-horizontal">
+    <dt>Tên đăng nhập</dt>
+    <dd>@Model.Username</dd>
+
+    <dt>Vai trò</dt>
+    <dd>@Model.UserRole</dd>
+</dl>
+
+<p>
+    @Html.ActionLink(
+        "Sửa mật khẩu",
+        "Edit",
+        new { id = Model.Username },
+        new { @class = "btn btn-warning" })
+
+    @Html.ActionLink(
+        "Xóa",
+        "Delete",
+        new { id = Model.Username },
+        new { @class = "btn btn-danger" })
+
+    @Html.ActionLink(
+        "Quay lại",
+        "Index",
+        null,
+        new { @class = "btn btn-default" })
+</p>
+

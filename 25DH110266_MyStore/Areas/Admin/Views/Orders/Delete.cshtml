@@ -1,0 +1,66 @@
+﻿
+@model _25DH110266_MyStore.Models.Order
+
+@{
+    ViewBag.Title = "Xóa đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+}
+
+<h2>Xóa đơn hàng</h2>
+<hr />
+
+<div class="alert alert-warning">
+    <strong>Bạn có chắc chắn muốn xóa đơn hàng này không?</strong>
+    <p>Thao tác này sẽ xóa đơn hàng khỏi cơ sở dữ liệu.</p>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <strong>Thông tin đơn hàng</strong>
+    </div>
+
+    <div class="panel-body">
+        <dl class="dl-horizontal">
+            <dt>Mã đơn hàng</dt>
+            <dd>@Model.OrderID</dd>
+
+            <dt>Khách hàng</dt>
+            <dd>
+                @(Model.Customer != null
+                    ? Model.Customer.CustomerName
+                    : "Chưa có thông tin")
+            </dd>
+
+            <dt>Ngày đặt hàng</dt>
+            <dd>@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+            <dt>Tổng tiền</dt>
+            <dd>@Model.TotalAmount.ToString("N0") VNĐ</dd>
+
+            <dt>Trạng thái thanh toán</dt>
+            <dd>@Model.PaymentStatus</dd>
+
+            <dt>Địa chỉ giao hàng</dt>
+            <dd>@Model.AddressDelivery</dd>
+        </dl>
+    </div>
+</div>
+
+@using (Html.BeginForm(
+    "Delete",
+    "Orders",
+    new { id = Model.OrderID },
+    FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <button type="submit" class="btn btn-danger">
+        Xác nhận xóa đơn hàng
+    </button>
+
+    @Html.ActionLink(
+        "Quay lại danh sách",
+        "Index",
+        null,
+        new { @class = "btn btn-default" })
+}

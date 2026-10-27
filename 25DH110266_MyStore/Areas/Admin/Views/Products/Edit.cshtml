@@ -1,0 +1,110 @@
+﻿
+@model _25DH110266_MyStore.Models.Product
+
+@{
+    ViewBag.Title = "Quản lý sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+}
+
+<h2>Chỉnh sửa sản phẩm</h2>
+<hr />
+
+@using (Html.BeginForm("Edit", "Products", FormMethod.Post,
+    new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ProductID)
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-horizontal">
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CategoryID, "Danh mục",
+                new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("CategoryID", null,
+                    "-- Chọn danh mục --",
+                    new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.CategoryID,
+                    "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ProductName, "Tên sản phẩm",
+                new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ProductName,
+                    new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ProductName,
+                    "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ProductPrice, "Giá sản phẩm (VNĐ)",
+                new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ProductPrice,
+                    new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ProductPrice,
+                    "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Ảnh hiện tại</label>
+            <div class="col-md-10">
+                @if (!String.IsNullOrWhiteSpace(Model.ProductImage))
+                {
+                    <img src="@Url.Content("~/Content/images/" + Model.ProductImage)"
+                         alt="@Model.ProductName"
+                         style="width:120px;height:120px;object-fit:contain;border:1px solid #ddd;padding:4px;"
+                         onerror="this.style.display='none';" />
+                }
+                else
+                {
+                    <p>Chưa có ảnh sản phẩm.</p>
+                }
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" for="uploadImage">
+                Chọn ảnh mới
+            </label>
+            <div class="col-md-10">
+                <input type="file" id="uploadImage" name="uploadImage"
+                       class="form-control" accept="image/*" />
+                <p class="help-block">
+                    Không chọn ảnh mới nếu muốn giữ nguyên ảnh hiện tại.
+                </p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ProductDescription, "Mô tả sản phẩm",
+                new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.ProductDescription,
+                    new { @class = "form-control", rows = "4" })
+                @Html.ValidationMessageFor(model => model.ProductDescription,
+                    "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Lưu thay đổi"
+                       class="btn btn-primary" />
+                @Html.ActionLink("Quay lại danh sách", "Index", null,
+                    new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

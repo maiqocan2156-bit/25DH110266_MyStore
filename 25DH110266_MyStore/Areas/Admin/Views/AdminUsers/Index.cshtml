@@ -1,0 +1,131 @@
+﻿
+@model IEnumerable<_25DH110266_MyStore.Models.User>
+
+@{
+    ViewBag.Title = "Quản lý tài khoản Admin";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 0;
+}
+
+<h2>Quản lý tài khoản Admin</h2>
+<hr />
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<p>
+    @Html.ActionLink(
+        "Thêm tài khoản Admin",
+        "Create",
+        null,
+        new { @class = "btn btn-primary" })
+</p>
+
+@using (Html.BeginForm("Index", "AdminUsers", FormMethod.Get))
+{
+    <div class="form-inline" style="margin-bottom:15px;">
+        @Html.TextBox(
+            "searchString",
+            ViewBag.CurrentFilter as string,
+            new
+            {
+                @class = "form-control",
+                placeholder = "Tìm theo tên đăng nhập..."
+            })
+
+        <button type="submit" class="btn btn-success">
+            Tìm kiếm
+        </button>
+
+        @Html.ActionLink(
+            "Làm mới",
+            "Index",
+            null,
+            new { @class = "btn btn-default" })
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr class="success">
+                <th>Tên đăng nhập</th>
+                <th>Vai trò</th>
+                <th style="width:300px;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Username</td>
+                        <td>@item.UserRole</td>
+                        <td>
+                            @Html.ActionLink(
+                                "Chi tiết",
+                                "Details",
+                                new { id = item.Username },
+                                new { @class = "btn btn-info btn-sm" })
+
+                            @Html.ActionLink(
+                                "Sửa",
+                                "Edit",
+                                new { id = item.Username },
+                                new { @class = "btn btn-warning btn-sm" })
+
+                            @Html.ActionLink(
+                                "Xóa",
+                                "Delete",
+                                new { id = item.Username },
+                                new { @class = "btn btn-danger btn-sm" })
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">
+                        Không tìm thấy tài khoản Admin.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (totalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="@(i == currentPage ? "active" : "")">
+                    @Html.ActionLink(
+                        i.ToString(),
+                        "Index",
+                        new
+                        {
+                            page = i,
+                            searchString = ViewBag.CurrentFilter
+                        })
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
