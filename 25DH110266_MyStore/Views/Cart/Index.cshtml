@@ -1,0 +1,204 @@
+﻿
+@model List<_25DH110266_MyStore.Models.ViewModel.CartItem>
+
+@{
+    ViewBag.Title = "Giỏ hàng";
+    decimal grandTotal = Model.Sum(x => x.Total);
+}
+
+<div class="container mt-5 mb-5">
+    <h2 class="mb-4">GIỎ HÀNG CỦA BẠN</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            Giỏ hàng hiện đang trống.
+        </div>
+
+        <a href="@Url.Action("Index", "Home")"
+           class="btn btn-primary">
+            Tiếp tục mua sắm
+        </a>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Chọn</th>
+                        <th>Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Đơn giá</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <input type="checkbox"
+                                       class="cart-select"
+                                       name="selectedProductIds"
+                                       value="@item.ProductID"
+                                       data-price="@item.ProductPrice" />
+                            </td>
+                            <td>
+                                <img src="@Url.Content("~/Content/images/" + item.ProductImage)"
+                                     alt="@item.ProductName"
+                                     style="width:80px;height:80px;object-fit:contain;" />
+                            </td>
+
+                            <td>@item.ProductName</td>
+
+                            <td>
+                                @item.ProductPrice.ToString("N0") đ
+                            </td>
+
+                            <td>
+                                @using (Html.BeginForm(
+                "UpdateQuantity", "Cart",
+                new { id = item.ProductID },
+                FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+
+                                    <div class="d-flex align-items-center">
+                                        <input type="number"
+                                               name="quantity"
+                                               value="@item.Quantity"
+                                               min="1"
+                                               class="form-control"
+                                               style="width:80px;" />
+
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm ml-2">
+                                            Cập nhật
+                                        </button>
+                                    </div>
+                                }
+                            </td>
+
+                            <td>
+                                @item.Total.ToString("N0") đ
+                            </td>
+
+                            <td>
+                                @using (Html.BeginForm(
+                "Remove", "Cart",
+                new { id = item.ProductID },
+                FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm">
+                                        Xóa
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-right mt-4">
+            <h4>
+                Tổng tiền sản phẩm đã chọn:
+                <span class="text-danger" id="selectedTotal">
+                    0 đ
+                </span>
+            </h4>
+        </div>
+
+        <div class="mt-3">
+            @using (Html.BeginForm(
+                "Checkout", "Cart",
+                FormMethod.Post,
+                new { id = "checkoutForm" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div id="selectedProducts"></div>
+
+                <button type="submit"
+                        class="btn btn-success">
+                    Thanh toán sản phẩm đã chọn
+                </button>
+            }
+        </div>
+
+        <div class="mt-3">
+            @using (Html.BeginForm(
+                "Clear", "Cart",
+                FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                <button type="submit"
+                        class="btn btn-danger">
+                    Xóa toàn bộ giỏ hàng
+                </button>
+            }
+
+            <a href="@Url.Action("Index", "Home")"
+               class="btn btn-primary">
+                Tiếp tục mua sắm
+            </a>
+        </div>
+    }
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        function calculateSelectedTotal() {
+            var total = 0;
+
+            var selectedProducts =
+                document.getElementById("selectedProducts");
+
+            selectedProducts.innerHTML = "";
+
+            document.querySelectorAll(".cart-select:checked")
+                .forEach(function (checkbox) {
+
+                    var row = checkbox.closest("tr");
+
+                    var price = parseFloat(
+                        checkbox.getAttribute("data-price")
+                    );
+
+                    var quantity = parseInt(
+                        row.querySelector('input[name="quantity"]').value
+                    );
+
+                    total += price * quantity;
+
+                    var hiddenInput = document.createElement("input");
+                    hiddenInput.type = "hidden";
+                    hiddenInput.name = "selectedProductIds";
+                    hiddenInput.value = checkbox.value;
+
+                    selectedProducts.appendChild(hiddenInput);
+                });
+
+            document.getElementById("selectedTotal").innerText =
+                total.toLocaleString("vi-VN") + " đ";
+        }
+
+        document.querySelectorAll(".cart-select")
+            .forEach(function (checkbox) {
+                checkbox.addEventListener("change", calculateSelectedTotal);
+            });
+
+        calculateSelectedTotal();
+    });
+</script>
+
+

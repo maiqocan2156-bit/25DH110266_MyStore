@@ -1,0 +1,146 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - MyStore</title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <style>
+        body {
+            padding-top: 70px;
+            background-color: #f8f9fa;
+        }
+
+        .customer-navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #ddd;
+        }
+
+            .customer-navbar .navbar-brand {
+                font-size: 25px;
+                font-weight: bold;
+                color: #0d6efd;
+            }
+
+            .customer-navbar .nav > li > a {
+                color: #333;
+            }
+
+                .customer-navbar .nav > li > a:hover {
+                    color: #0d6efd;
+                    background-color: transparent;
+                }
+
+        .customer-content {
+            min-height: 500px;
+            padding-top: 25px;
+            padding-bottom: 30px;
+        }
+
+        .customer-footer {
+            background: #ffffff;
+            border-top: 1px solid #ddd;
+            padding: 20px 0;
+            text-align: center;
+        }
+    </style>
+
+    @RenderSection("styles", required: false)
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top customer-navbar">
+        <div class="container">
+            <div class="navbar-header">
+
+                @Html.ActionLink(
+                    "MyStore",
+                    "Index",
+                    "Home",
+                    new { area = "" },
+                    new { @class = "navbar-brand" }
+                )
+            </div>
+
+            <div class="navbar-collapse" id="customerMenu">
+                <ul class="nav navbar-nav">
+                    <li>
+                        @Html.ActionLink("Trang chủ", "Index", "Home")
+                    </li>
+                    <li>
+                        @Html.ActionLink("Sản phẩm", "ProductList", "Home")
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        @Html.ActionLink("Giỏ hàng", "Index", "Cart")
+                    </li>
+
+                    @if (Session["CustomerID"] != null)
+                    {
+                        <li>
+                            @Html.ActionLink(
+                                "Thông tin cá nhân",
+                                "ProfileInfo",
+                                "CustomerAccount"
+                            )
+                        </li>
+
+                        <li>
+                            @Html.ActionLink(
+                                "Đổi mật khẩu",
+                                "ChangePassword",
+                                "CustomerAccount"
+                            )
+                        </li>
+
+                        <li>
+                            @Html.ActionLink(
+                                "Đăng xuất",
+                                "Logout",
+                                "CustomerAccount"
+                            )
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            @Html.ActionLink(
+                                "Đăng nhập",
+                                "Login",
+                                "CustomerAccount"
+                            )
+                        </li>
+
+                        <li>
+                            @Html.ActionLink(
+                                "Đăng ký",
+                                "Register",
+                                "CustomerAccount"
+                            )
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container customer-content">
+        @RenderBody()
+    </div>
+
+    <footer class="customer-footer">
+        <div class="container">
+            <p>&copy; @DateTime.Now.Year - MyStore</p>
+        </div>
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

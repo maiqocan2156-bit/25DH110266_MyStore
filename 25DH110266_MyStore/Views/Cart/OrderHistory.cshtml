@@ -1,0 +1,56 @@
+﻿@model List<_25DH110266_MyStore.Models.Order>
+
+@{
+    ViewBag.Title = "Lịch sử đơn hàng";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">LỊCH SỬ ĐƠN HÀNG</h2>
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="alert alert-info text-center">
+            Bạn chưa có đơn hàng nào.
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Mã đơn hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Địa chỉ giao hàng</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>#@item.OrderID</td>
+                        <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@item.TotalAmount.ToString("N0") đ</td>
+                        <td>@item.PaymentStatus</td>
+                        <td>@item.AddressDelivery</td>
+                        <td>
+                            <a href="@Url.Action("OrderDetail", "Cart",
+                                new { id = item.OrderID })"
+                               class="btn btn-info btn-sm">
+                                Xem chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <a href="@Url.Action("Index", "Home")"
+       class="btn btn-primary">
+        Tiếp tục mua sắm
+    </a>
+</div>
