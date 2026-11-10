@@ -16,6 +16,8 @@
                 <p><strong>Ngày đặt:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
                 <p><strong>Trạng thái:</strong> @order.PaymentStatus</p>
                 <p><strong>Địa chỉ giao hàng:</strong> @order.AddressDelivery</p>
+                <p><strong>Hình thức giao hàng:</strong> @order.DeliveryMethod</p>
+                <p><strong>Phương thức thanh toán:</strong> @order.PaymentMethod</p>
             </div>
         </div>
 
@@ -51,6 +53,7 @@
                 }
             </tbody>
         </table>
+
 
         <h4 class="text-right text-danger">
             Tổng tiền: @order.TotalAmount.ToString("N0") đ

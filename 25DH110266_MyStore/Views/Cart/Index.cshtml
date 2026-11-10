@@ -126,8 +126,40 @@
 
                 <div id="selectedProducts"></div>
 
+                <div class="mt-3">
+                    <label><strong>Địa chỉ giao hàng:</strong></label>
+
+                    <input type="text"
+                           name="addressDelivery"
+                           class="form-control"
+                           placeholder="Nhập địa chỉ giao hàng" />
+                </div>
+
+                <div class="mt-3">
+                    <label><strong>Hình thức giao hàng:</strong></label>
+                    <select name="deliveryMethod" class="form-control">
+                        <option value="Giao hàng tận nơi">Giao hàng tận nơi</option>
+                        <option value="Nhận tại cửa hàng">Nhận tại cửa hàng</option>
+                    </select>
+                </div>
+
+                <div class="mt-3">
+                    <label><strong>Phương thức thanh toán:</strong></label>
+                    <select name="paymentMethod" class="form-control">
+                        <option value="Thanh toán khi nhận hàng">
+                            Thanh toán khi nhận hàng (COD)
+                        </option>
+                        <option value="Chuyển khoản ngân hàng">
+                            Chuyển khoản ngân hàng
+                        </option>
+                        <option value="Thanh toán trực tuyến">
+                            Thanh toán trực tuyến
+                        </option>
+                    </select>
+                </div>
+
                 <button type="submit"
-                        class="btn btn-success">
+                        class="btn btn-success mt-3">
                     Thanh toán sản phẩm đã chọn
                 </button>
             }

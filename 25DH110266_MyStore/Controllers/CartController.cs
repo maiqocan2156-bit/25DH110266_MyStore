@@ -116,7 +116,11 @@ namespace _25DH110266_MyStore.Controllers
         // Thanh toán các sản phẩm được chọn
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Checkout(int[] selectedProductIds)
+        public ActionResult Checkout(
+            int[] selectedProductIds,
+            string deliveryMethod,
+            string paymentMethod,
+            string addressDelivery)
         {
             // Kiểm tra đăng nhập
             if (Session["CustomerID"] == null)
@@ -173,8 +177,17 @@ namespace _25DH110266_MyStore.Controllers
                     CustomerID = customerId,
                     OrderDate = DateTime.Now,
                     TotalAmount = selectedItems.Sum(x => x.Total),
+
                     PaymentStatus = "Chưa thanh toán",
-                    AddressDelivery = customer.CustomerAddress
+
+                    AddressDelivery = string.IsNullOrEmpty(addressDelivery)
+                        ? (string.IsNullOrEmpty(customer.CustomerAddress)
+                            ? "Chưa cập nhật địa chỉ"
+                            : customer.CustomerAddress)
+                        : addressDelivery,
+
+                    DeliveryMethod = deliveryMethod,
+                    PaymentMethod = paymentMethod
                 };
 
                 db.Orders.Add(order);
@@ -201,7 +214,8 @@ namespace _25DH110266_MyStore.Controllers
                         OrderID = order.OrderID,
                         ProductID = item.ProductID,
                         Quantity = item.Quantity,
-                        UnitPrice = item.ProductPrice
+                        UnitPrice = item.ProductPrice,
+                        TotalPrice = item.Quantity * item.ProductPrice
                     };
 
                     db.OrderDetails.Add(detail);
@@ -233,9 +247,22 @@ namespace _25DH110266_MyStore.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.OrderID = TempData["OrderID"];
+            int orderId = (int)TempData["OrderID"];
+            int customerId = (int)Session["CustomerID"];
 
-            return View();
+            using (var db = new MyStoreEntities())
+            {
+                var order = db.Orders.FirstOrDefault(x =>
+                    x.OrderID == orderId &&
+                    x.CustomerID == customerId);
+
+                if (order == null)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                return View(order);
+            }
         }
 
         // Hiển thị lịch sử đơn hàng của khách hàng

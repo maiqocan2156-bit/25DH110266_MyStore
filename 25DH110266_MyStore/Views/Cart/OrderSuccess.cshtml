@@ -1,8 +1,11 @@
-﻿@{
+﻿@model _25DH110266_MyStore.Models.Order
+
+@{
     ViewBag.Title = "Đặt hàng thành công";
 }
 
 <div class="container mt-5 text-center">
+
     <h2 class="text-success">
         Đặt hàng thành công!
     </h2>
@@ -11,15 +14,54 @@
         Cảm ơn bạn đã mua sắm tại cửa hàng.
     </p>
 
-    <h4>
-        Mã đơn hàng:
-        <span class="text-danger">
-            #@ViewBag.OrderID
-        </span>
-    </h4>
+    <div class="card mt-4 text-left">
+        <div class="card-body">
+
+            <h4 class="mb-3">Thông tin đơn hàng</h4>
+
+            <p>
+                <strong>Mã đơn hàng:</strong>
+                <span class="text-danger">
+                    #@Model.OrderID
+                </span>
+            </p>
+
+            <p>
+                <strong>Ngày đặt:</strong>
+                @Model.OrderDate.ToString("dd/MM/yyyy")
+            </p>
+
+            <p>
+                <strong>Tổng tiền:</strong>
+                @Model.TotalAmount.ToString("N0") đ
+            </p>
+
+            <p>
+                <strong>Địa chỉ giao hàng:</strong>
+                @Model.AddressDelivery
+            </p>
+
+            <p>
+                <strong>Hình thức giao hàng:</strong>
+                @Model.DeliveryMethod
+            </p>
+
+            <p>
+                <strong>Phương thức thanh toán:</strong>
+                @Model.PaymentMethod
+            </p>
+
+            <p>
+                <strong>Trạng thái thanh toán:</strong>
+                @Model.PaymentStatus
+            </p>
+
+        </div>
+    </div>
 
     <a href="@Url.Action("Index", "Home")"
        class="btn btn-primary mt-3">
         Tiếp tục mua sắm
     </a>
+
 </div>
