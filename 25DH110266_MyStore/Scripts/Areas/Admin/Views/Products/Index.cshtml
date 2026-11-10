@@ -1,0 +1,304 @@
+﻿
+@model IEnumerable<_25DH110266_MyStore.Models.Product>
+
+@{
+    ViewBag.Title = "Quản lý sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+}
+
+<h2>Quản lý sản phẩm</h2>
+<hr />
+
+<p>
+    @Html.ActionLink(
+        "+ Thêm sản phẩm mới",
+        "Create",
+        "Products",
+        new { area = "Admin" },
+        new { @class = "btn btn-primary" }
+    )
+</p>
+
+@using (Html.BeginForm(
+    "Index",
+    "Products",
+    new { area = "Admin" },
+    FormMethod.Get,
+    new { @class = "form-inline" }))
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <strong>Tìm kiếm sản phẩm</strong>
+        </div>
+
+        <div class="panel-body">
+            <div class="form-group" style="margin: 5px;">
+                <label for="searchString">Từ khóa</label>
+
+                @Html.TextBox(
+                    "searchString",
+                    (object)(ViewBag.CurrentFilter ?? ""),
+                    new
+                    {
+                        @class = "form-control",
+                        placeholder = "Tên, mô tả hoặc danh mục",
+                        style = "min-width:250px;"
+                    }
+                )
+            </div>
+
+            <div class="form-group" style="margin: 5px;">
+                <label for="minPrice">Giá từ</label>
+
+                @Html.TextBox(
+                    "minPrice",
+                    (object)ViewBag.MinPrice,
+                    new
+                    {
+                        @class = "form-control",
+                        type = "number",
+                        min = "0",
+                        step = "0.01",
+                        placeholder = "Giá thấp nhất"
+                    }
+                )
+            </div>
+
+            <div class="form-group" style="margin: 5px;">
+                <label for="maxPrice">Đến</label>
+
+                @Html.TextBox(
+                    "maxPrice",
+                    (object)ViewBag.MaxPrice,
+                    new
+                    {
+                        @class = "form-control",
+                        type = "number",
+                        min = "0",
+                        step = "0.01",
+                        placeholder = "Giá cao nhất"
+                    }
+                )
+            </div>
+
+            <div class="form-group" style="margin: 5px;">
+                <button type="submit" class="btn btn-primary">
+                    Tìm kiếm
+                </button>
+
+                @Html.ActionLink(
+                    "Xóa bộ lọc",
+                    "Index",
+                    "Products",
+                    new { area = "Admin" },
+                    new { @class = "btn btn-default" }
+                )
+            </div>
+        </div>
+    </div>
+}
+
+@Html.ValidationSummary(
+    false,
+    "",
+    new { @class = "text-danger" }
+)
+
+<p>
+    <strong>Sắp xếp:</strong>
+
+    @Html.ActionLink(
+        "Tên A-Z",
+        "Index",
+        new
+        {
+            area = "Admin",
+            sortOrder = "",
+            searchString = ViewBag.CurrentFilter,
+            minPrice = ViewBag.MinPrice,
+            maxPrice = ViewBag.MaxPrice,
+            page = 1
+        }
+    )
+    |
+
+    @Html.ActionLink(
+        "Tên Z-A",
+        "Index",
+        new
+        {
+            area = "Admin",
+            sortOrder = "name_desc",
+            searchString = ViewBag.CurrentFilter,
+            minPrice = ViewBag.MinPrice,
+            maxPrice = ViewBag.MaxPrice,
+            page = 1
+        }
+    )
+    |
+
+    @Html.ActionLink(
+        "Giá tăng dần",
+        "Index",
+        new
+        {
+            area = "Admin",
+            sortOrder = "price_asc",
+            searchString = ViewBag.CurrentFilter,
+            minPrice = ViewBag.MinPrice,
+            maxPrice = ViewBag.MaxPrice,
+            page = 1
+        }
+    )
+    |
+
+    @Html.ActionLink(
+        "Giá giảm dần",
+        "Index",
+        new
+        {
+            area = "Admin",
+            sortOrder = "price_desc",
+            searchString = ViewBag.CurrentFilter,
+            minPrice = ViewBag.MinPrice,
+            maxPrice = ViewBag.MaxPrice,
+            page = 1
+        }
+    )
+</p>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr class="active">
+                <th>Tên sản phẩm</th>
+                <th>Giá sản phẩm</th>
+                <th>Hình ảnh</th>
+                <th>Mô tả</th>
+                <th>Danh mục</th>
+                <th style="min-width: 160px;">Thao tác</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.ProductName</td>
+
+                        <td>
+                            @item.ProductPrice.ToString("N0") VNĐ
+                        </td>
+
+                        <td>
+                            @if (!String.IsNullOrWhiteSpace(item.ProductImage))
+                            {
+                                <img src="@Url.Content("~/Content/images/" + item.ProductImage)"
+                                     alt="@item.ProductName"
+                                     style="width:80px;height:80px;object-fit:contain;border:1px solid #ddd;padding:3px;"
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='inline';" />
+
+                                <span style="display:none;color:#b94a48;">
+                                    Không tải được ảnh
+                                </span>
+                            }
+                            else
+                            {
+                                <span>Chưa có ảnh</span>
+                            }
+                        </td>
+
+                        <td>@item.ProductDescription</td>
+
+                        <td>
+                            @(item.Category != null
+                                ? item.Category.CategoryName
+                                : "Chưa phân loại")
+                        </td>
+
+                        <td>
+                            @Html.ActionLink(
+                                "Sửa",
+                                "Edit",
+                                "Products",
+                                new
+                                {
+                                    area = "Admin",
+                                    id = item.ProductID
+                                },
+                                new { @class = "btn btn-warning btn-sm" }
+                            )
+
+                            @Html.ActionLink(
+                                "Chi tiết",
+                                "Details",
+                                "Products",
+                                new
+                                {
+                                    area = "Admin",
+                                    id = item.ProductID
+                                },
+                                new { @class = "btn btn-info btn-sm" }
+                            )
+
+                            @Html.ActionLink(
+                                "Xóa",
+                                "Delete",
+                                "Products",
+                                new
+                                {
+                                    area = "Admin",
+                                    id = item.ProductID
+                                },
+                                new { @class = "btn btn-danger btn-sm" }
+                            )
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center">
+                        Không tìm thấy sản phẩm nào.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (ViewBag.TotalPages != null &&
+    (int)ViewBag.TotalPages > 1)
+{
+    <div class="text-center">
+        <span>Trang: </span>
+
+        @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+        {
+            if (i == (int)ViewBag.CurrentPage)
+            {
+                <strong class="btn btn-primary">@i</strong>
+            }
+            else
+            {
+                @Html.ActionLink(
+                    i.ToString(),
+                    "Index",
+                    new
+                    {
+                        area = "Admin",
+                        page = i,
+                        searchString = ViewBag.CurrentFilter,
+                        sortOrder = ViewBag.CurrentSort,
+                        minPrice = ViewBag.MinPrice,
+                        maxPrice = ViewBag.MaxPrice
+                    },
+                    new { @class = "btn btn-default" }
+                )
+            }
+        }
+    </div>
+}

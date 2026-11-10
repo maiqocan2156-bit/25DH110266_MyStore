@@ -1,0 +1,67 @@
+﻿@model List<_25DH110266_MyStore.Models.OrderDetail>
+
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    var order = ViewBag.Order as _25DH110266_MyStore.Models.Order;
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">CHI TIẾT ĐƠN HÀNG</h2>
+
+    @if (order != null)
+    {
+        <div class="card mb-4">
+            <div class="card-body">
+                <p><strong>Mã đơn hàng:</strong> #@order.OrderID</p>
+                <p><strong>Ngày đặt:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                <p><strong>Trạng thái:</strong> @order.PaymentStatus</p>
+                <p><strong>Địa chỉ giao hàng:</strong> @order.AddressDelivery</p>
+                <p><strong>Hình thức giao hàng:</strong> @order.DeliveryMethod</p>
+                <p><strong>Phương thức thanh toán:</strong> @order.PaymentMethod</p>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Hình ảnh</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <img src="@Url.Content("~/Content/images/" + item.Product.ProductImage)"
+                                 alt="@item.Product.ProductName"
+                                 style="width:80px;height:80px;object-fit:contain;" />
+                        </td>
+
+                        <td>@item.Product.ProductName</td>
+
+                        <td>@item.UnitPrice.ToString("N0") đ</td>
+
+                        <td>@item.Quantity</td>
+
+                        <td>@((item.UnitPrice * item.Quantity).ToString("N0")) đ</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+        <h4 class="text-right text-danger">
+            Tổng tiền: @order.TotalAmount.ToString("N0") đ
+        </h4>
+    }
+
+    <a href="@Url.Action("OrderHistory", "Cart")"
+       class="btn btn-secondary mt-3">
+        Quay lại lịch sử đơn hàng
+    </a>
+</div>

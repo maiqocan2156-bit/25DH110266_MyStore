@@ -1,0 +1,48 @@
+﻿
+@model IEnumerable<_25DH110266_MyStore.Models.Product>
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    @if (!string.IsNullOrEmpty(item.ProductImage))
+                    {
+                        <img src="@(item.ProductImage.StartsWith("http")
+                            ? item.ProductImage
+                            : Url.Content("~/Content/images/" + item.ProductImage))"
+                             class="card-img-top"
+                             alt="@item.ProductName"
+                             style="height: 180px; object-fit: contain;"
+                             onerror="this.style.display='none';" />
+                    }
+
+                <div class="card-body">
+                    <h5 class="card-title">@item.ProductName</h5>
+
+                    <p class="card-text">
+                        @item.ProductDescription
+                    </p>
+
+                    <p class="text-danger font-weight-bold">
+                        @String.Format("{0:N0} đ", item.ProductPrice)
+                    </p>
+
+                    <a href="@Url.Action("ProductDetail", "Home",
+                        new { id = item.ProductID })"
+                       class="btn btn-primary">
+                        Xem chi tiết
+                    </a>
+                </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>Không có sản phẩm nổi bật.</p>
+    }
+</div>
+

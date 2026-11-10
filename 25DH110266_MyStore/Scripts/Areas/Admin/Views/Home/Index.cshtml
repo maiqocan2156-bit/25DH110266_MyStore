@@ -1,0 +1,247 @@
+﻿
+@model IEnumerable<_25DH110266_MyStore.Models.CategoryProductStatisticViewModel>
+
+@using System.Linq
+@using System.Web.Helpers
+
+@{
+    ViewBag.Title = "Trang chủ quản trị";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+
+    var chartItems = Model.Select(x => new
+    {
+        name = x.CategoryName,
+        count = x.ProductCount
+    });
+
+    var chartJson = Json.Encode(chartItems);
+}
+
+<h2>Trang chủ quản trị</h2>
+<p>Chào mừng bạn đến với hệ thống quản lý My Store.</p>
+<hr />
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Sản phẩm</div>
+            <div class="panel-body">
+                <h2>@ViewBag.TotalProducts</h2>
+                <p>
+                    @Html.ActionLink(
+                        "Quản lý sản phẩm",
+                        "Index",
+                        "Products",
+                        new { area = "Admin" },
+                        null)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="panel panel-success">
+            <div class="panel-heading">Danh mục</div>
+            <div class="panel-body">
+                <h2>@ViewBag.TotalCategories</h2>
+                <p>
+                    @Html.ActionLink(
+                        "Quản lý danh mục",
+                        "Index",
+                        "Categories",
+                        new { area = "Admin" },
+                        null)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="panel panel-info">
+            <div class="panel-heading">Khách hàng</div>
+            <div class="panel-body">
+                <h2>@ViewBag.TotalCustomers</h2>
+                <p>
+                    @Html.ActionLink(
+                        "Quản lý khách hàng",
+                        "Index",
+                        "Customers",
+                        new { area = "Admin" },
+                        null)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="panel panel-warning">
+            <div class="panel-heading">Đơn hàng</div>
+            <div class="panel-body">
+                <h2>@ViewBag.TotalOrders</h2>
+                <p>
+                    @Html.ActionLink(
+                        "Quản lý đơn hàng",
+                        "Index",
+                        "Orders",
+                        new { area = "Admin" },
+                        null)
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title">THỐNG KÊ HÀNG HÓA TỪNG LOẠI</h3>
+    </div>
+
+    <div class="panel-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr class="success">
+                            <th>Loại hàng</th>
+                            <th>Số lượng</th>
+                            <th>Giá cao nhất</th>
+                            <th>Giá thấp nhất</th>
+                            <th>Giá trung bình</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.CategoryName</td>
+                                <td>@item.ProductCount</td>
+                                <td>@item.MaxPrice.ToString("N0") VNĐ</td>
+                                <td>@item.MinPrice.ToString("N0") VNĐ</td>
+                                <td>@item.AveragePrice.ToString("N0") VNĐ</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="button" id="btnShowChart"
+                    class="btn btn-default">
+                Xem biểu đồ
+            </button>
+
+            <div id="chartSection" style="display:none; margin-top:20px;">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">BIỂU ĐỒ THỐNG KÊ</h3>
+                    </div>
+
+                    <div class="panel-body">
+                        <div id="categoryPieChart"
+                             style="width:100%; min-height:420px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p>Chưa có sản phẩm để thống kê.</p>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @if (Model != null && Model.Any())
+    {
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+        <script>
+            (function () {
+                var categoryStats = @Html.Raw(chartJson);
+                var chartVisible = false;
+                var chartReady = false;
+
+                google.charts.load('current', {
+                    packages: ['corechart']
+                });
+
+                google.charts.setOnLoadCallback(function () {
+                    chartReady = true;
+
+                    if (chartVisible) {
+                        drawCategoryChart();
+                    }
+                });
+
+                function drawCategoryChart() {
+                    if (!chartReady || !categoryStats || categoryStats.length === 0) {
+                        return;
+                    }
+
+                    var data = new google.visualization.DataTable();
+
+                    data.addColumn('string', 'Loại hàng');
+                    data.addColumn('number', 'Số lượng');
+
+                    categoryStats.forEach(function (item) {
+                        data.addRow([
+                            item.name || 'Chưa phân loại',
+                            Number(item.count) || 0
+                        ]);
+                    });
+
+                    var options = {
+                        title: 'TỶ LỆ HÀNG HÓA',
+                        is3D: true,
+                        pieSliceText: 'percentage',
+                        legend: {
+                            position: 'right',
+                            textStyle: {
+                                fontSize: 13
+                            }
+                        },
+                        chartArea: {
+                            left: 20,
+                            top: 60,
+                            width: '90%',
+                            height: '75%'
+                        },
+                        height: 420
+                    };
+
+                    var chart = new google.visualization.PieChart(
+                        document.getElementById('categoryPieChart')
+                    );
+
+                    chart.draw(data, options);
+                }
+
+                document.getElementById('btnShowChart')
+                    .addEventListener('click', function () {
+                        var section = document.getElementById('chartSection');
+
+                        chartVisible = !chartVisible;
+                        section.style.display = chartVisible ? 'block' : 'none';
+
+                        this.textContent = chartVisible
+                            ? 'Ẩn biểu đồ'
+                            : 'Xem biểu đồ';
+
+                        if (chartVisible) {
+                            drawCategoryChart();
+                        }
+                    });
+
+                window.addEventListener('resize', function () {
+                    if (chartVisible) {
+                        drawCategoryChart();
+                    }
+                });
+            })();
+        </script>
+    }
+}

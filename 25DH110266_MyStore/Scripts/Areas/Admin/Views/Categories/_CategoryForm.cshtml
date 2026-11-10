@@ -1,0 +1,14 @@
+﻿
+@model _25DH110266_MyStore.Models.Category
+
+<div class="form-group">
+    @Html.LabelFor(model => model.CategoryName, "Tên danh mục",
+        htmlAttributes: new { @class = "control-label" })
+
+    @Html.EditorFor(model => model.CategoryName,
+        new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập tên danh mục..." } })
+
+    @Html.ValidationMessageFor(model => model.CategoryName,
+        "", new { @class = "text-danger" })
+</div>
+

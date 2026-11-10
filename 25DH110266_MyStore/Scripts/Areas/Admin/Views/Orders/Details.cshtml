@@ -1,0 +1,121 @@
+﻿
+@model _25DH110266_MyStore.Models.Order
+
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+}
+
+<h2>Chi tiết đơn hàng</h2>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Thông tin đơn hàng #@Model.OrderID</h4>
+    </div>
+
+    <div class="panel-body">
+        <dl class="dl-horizontal">
+            <dt>Mã đơn hàng</dt>
+            <dd>@Model.OrderID</dd>
+
+            <dt>Ngày đặt hàng</dt>
+            <dd>@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+            <dt>Tổng tiền</dt>
+            <dd>@Model.TotalAmount.ToString("N0") VNĐ</dd>
+
+            <dt>Trạng thái thanh toán</dt>
+            <dd>@Model.PaymentStatus</dd>
+
+            <dt>Địa chỉ giao hàng</dt>
+            <dd>@Model.AddressDelivery</dd>
+
+            <dt>Mã khách hàng</dt>
+            <dd>@Model.CustomerID</dd>
+
+            <dt>Tên khách hàng</dt>
+            <dd>
+                @(Model.Customer != null
+                    ? Model.Customer.CustomerName
+                    : "Chưa có thông tin")
+            </dd>
+
+            @if (Model.Customer != null)
+            {
+                <dt>Số điện thoại</dt>
+                <dd>@Model.Customer.CustomerPhone</dd>
+
+                <dt>Email</dt>
+                <dd>@Model.Customer.CustomerEmail</dd>
+            }
+        </dl>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Chi tiết sản phẩm trong đơn hàng</h4>
+    </div>
+
+    <div class="panel-body">
+        @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+        {
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        int stt = 1;
+                    }
+
+                    @foreach (var detail in Model.OrderDetails)
+                    {
+                        <tr>
+                            <td>@stt</td>
+                            <td>
+                                @if (detail.Product != null)
+                                {
+                                    @detail.Product.ProductName
+                                }
+                                else
+                                {
+                                    <span>Không có thông tin sản phẩm</span>
+                                }
+                            </td>
+                            <td>@detail.Quantity</td>
+                            <td>@detail.UnitPrice.ToString("N0") VNĐ</td>
+                            <td>
+                                @((detail.Quantity * detail.UnitPrice)
+                                    .ToString("N0")) VNĐ
+                            </td>
+                        </tr>
+
+                        stt++;
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Đơn hàng chưa có thông tin chi tiết sản phẩm.</p>
+        }
+    </div>
+</div>
+
+<p>
+    @Html.ActionLink("Chỉnh sửa", "Edit",
+        new { id = Model.OrderID },
+        new { @class = "btn btn-warning" })
+
+    @Html.ActionLink("Quay lại danh sách", "Index",
+        null,
+        new { @class = "btn btn-default" })
+</p>

@@ -1,0 +1,57 @@
+﻿
+@model _25DH110266_MyStore.Models.Customer
+
+@{
+    ViewBag.Title = "Xóa khách hàng";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+}
+
+<h2>Xóa khách hàng</h2>
+<hr />
+
+<div class="alert alert-warning">
+    <strong>Bạn có chắc chắn muốn xóa khách hàng này không?</strong>
+    <p>Thao tác này có thể ảnh hưởng đến dữ liệu liên quan đến khách hàng.</p>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <strong>Thông tin khách hàng</strong>
+    </div>
+
+    <div class="panel-body">
+        <dl class="dl-horizontal">
+            <dt>Họ và tên</dt>
+            <dd>@Html.DisplayFor(model => model.CustomerName)</dd>
+
+            <dt>Số điện thoại</dt>
+            <dd>@Html.DisplayFor(model => model.CustomerPhone)</dd>
+
+            <dt>Email</dt>
+            <dd>@Html.DisplayFor(model => model.CustomerEmail)</dd>
+
+            <dt>Địa chỉ</dt>
+            <dd>@Html.DisplayFor(model => model.CustomerAddress)</dd>
+
+            <dt>Tài khoản</dt>
+            <dd>
+                @(Model.User != null
+                    ? Model.User.Username
+                    : "Chưa có thông tin tài khoản")
+            </dd>
+        </dl>
+    </div>
+</div>
+
+@using (Html.BeginForm("Delete", "Customers",
+    new { id = Model.CustomerID }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <button type="submit" class="btn btn-danger">
+        Xác nhận xóa khách hàng
+    </button>
+
+    @Html.ActionLink("Quay lại danh sách", "Index",
+        null, new { @class = "btn btn-default" })
+}

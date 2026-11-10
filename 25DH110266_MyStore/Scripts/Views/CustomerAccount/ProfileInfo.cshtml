@@ -1,0 +1,55 @@
+﻿@model _25DH110266_MyStore.Models.Customer
+
+@{
+    ViewBag.Title = "Thông tin cá nhân";
+}
+
+<div class="container mt-5" style="max-width: 700px;">
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h2 class="text-center mb-4">THÔNG TIN CÁ NHÂN</h2>
+
+            <div class="form-group">
+                <label>Tên đăng nhập</label>
+                <input class="form-control" value="@Model.Username" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>Họ và tên</label>
+                <input class="form-control" value="@Model.CustomerName" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>Số điện thoại</label>
+                <input class="form-control" value="@Model.CustomerPhone" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input class="form-control" value="@Model.CustomerEmail" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>Địa chỉ</label>
+                <textarea class="form-control" rows="3" readonly>@Model.CustomerAddress</textarea>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="@Url.Action("UpdateProfile", "CustomerAccount")"
+                   class="btn btn-success">
+                    Cập nhật thông tin
+                </a>
+
+                <a href="@Url.Action("ChangePassword", "CustomerAccount")"
+                   class="btn btn-warning">
+                    Đổi mật khẩu
+                </a>
+
+                <a href="@Url.Action("Index", "Home")"
+                   class="btn btn-secondary">
+                    Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

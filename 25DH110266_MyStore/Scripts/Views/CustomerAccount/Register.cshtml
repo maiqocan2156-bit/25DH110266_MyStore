@@ -1,0 +1,77 @@
+﻿@model _25DH110266_MyStore.Models.ViewModel.RegisterVM
+
+@{
+    ViewBag.Title = "Đăng ký tài khoản";
+}
+
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h2 class="text-center mb-4">ĐĂNG KÝ TÀI KHOẢN</h2>
+
+            @using (Html.BeginForm("Register", "CustomerAccount", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                <div class="form-group mb-3">
+                    <label>Tên đăng nhập</label>
+                    @Html.TextBoxFor(m => m.Username,
+                        new { @class = "form-control", placeholder = "Nhập tên đăng nhập" })
+                    @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Mật khẩu</label>
+                    @Html.PasswordFor(m => m.Password,
+                        new { @class = "form-control", placeholder = "Nhập mật khẩu" })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Nhập lại mật khẩu</label>
+                    @Html.PasswordFor(m => m.ConfirmPassword,
+                        new { @class = "form-control", placeholder = "Nhập lại mật khẩu" })
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Họ và tên</label>
+                    @Html.TextBoxFor(m => m.CustomerName,
+                        new { @class = "form-control", placeholder = "Nhập họ tên" })
+                    @Html.ValidationMessageFor(m => m.CustomerName, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Số điện thoại</label>
+                    @Html.TextBoxFor(m => m.CustomerPhone,
+                        new { @class = "form-control", placeholder = "Nhập số điện thoại" })
+                    @Html.ValidationMessageFor(m => m.CustomerPhone, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Email</label>
+                    @Html.TextBoxFor(m => m.CustomerEmail,
+                        new { @class = "form-control", placeholder = "Nhập email" })
+                    @Html.ValidationMessageFor(m => m.CustomerEmail, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Địa chỉ</label>
+                    @Html.TextAreaFor(m => m.CustomerAddress,
+                        new { @class = "form-control", rows = 3, placeholder = "Nhập địa chỉ" })
+                </div>
+
+                <button type="submit" class="btn btn-success btn-block">
+                    Đăng ký
+                </button>
+            }
+
+            <div class="text-center mt-3">
+                Đã có tài khoản?
+                <a href="@Url.Action("Login", "CustomerAccount")">Đăng nhập</a>
+            </div>
+        </div>
+    </div>
+</div>

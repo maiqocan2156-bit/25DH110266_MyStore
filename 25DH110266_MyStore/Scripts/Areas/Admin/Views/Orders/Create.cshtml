@@ -1,0 +1,90 @@
+﻿
+@model _25DH110266_MyStore.Models.Order
+
+@{
+    ViewBag.Title = "Tạo đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+}
+
+<h2>Tạo đơn hàng mới</h2>
+<hr />
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Thông tin đơn hàng</h4>
+        <hr />
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CustomerID, "Khách hàng",
+                new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("CustomerID", null,
+                    "-- Chọn khách hàng --",
+                    new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.CustomerID,
+                    "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.OrderDate, "Ngày đặt hàng",
+                new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.OrderDate, "{0:yyyy-MM-dd}",
+                    new { @class = "form-control", type = "date" })
+                @Html.ValidationMessageFor(model => model.OrderDate,
+                    "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TotalAmount, "Tổng tiền (VNĐ)",
+                new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.TotalAmount,
+                    new { @class = "form-control", type = "number", min = "0", step = "1000" })
+                @Html.ValidationMessageFor(model => model.TotalAmount,
+                    "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PaymentStatus, "Trạng thái thanh toán",
+                new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.PaymentStatus,
+                    new { @class = "form-control", placeholder = "Ví dụ: Chưa thanh toán" })
+                @Html.ValidationMessageFor(model => model.PaymentStatus,
+                    "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AddressDelivery, "Địa chỉ giao hàng",
+                new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.AddressDelivery,
+                    new { @class = "form-control", rows = "3", placeholder = "Nhập địa chỉ giao hàng..." })
+                @Html.ValidationMessageFor(model => model.AddressDelivery,
+                    "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button type="submit" class="btn btn-primary">Tạo đơn hàng</button>
+                @Html.ActionLink("Quay lại danh sách", "Index",
+                    null, new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

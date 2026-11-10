@@ -1,0 +1,36 @@
+﻿@model _25DH110266_MyStore.Models.ViewModel.HomeProductVM
+
+@{
+    ViewBag.Title = "Trang chủ";
+}
+
+<main class="customer-home">
+
+    <section class="home-banner">
+        <h1>Chào mừng đến với MyStore</h1>
+        <p>Khám phá các sản phẩm dành cho bạn</p>
+    </section>
+
+    <section class="home-search">
+        @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+        {
+            <input type="text"
+                   name="searchTearm"
+                   value="@Request.QueryString["searchTearm"]"
+                   placeholder="Tìm kiếm sản phẩm..." />
+
+            <button type="submit">Tìm kiếm</button>
+        }
+    </section>
+
+    <section class="featured-products">
+        <h2>Sản phẩm nổi bật</h2>
+        @Html.Partial("_PVFeatureProduct", Model.FeaturedProducts)
+    </section>
+
+    <section class="new-products">
+        <h2>Sản phẩm mới</h2>
+        @Html.Partial("_PVNewProduct", Model.NewProducts)
+    </section>
+
+</main>
