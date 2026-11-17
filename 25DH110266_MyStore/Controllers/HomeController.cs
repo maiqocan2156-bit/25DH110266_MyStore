@@ -11,12 +11,15 @@ namespace _25DH110266_MyStore.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index(string searchTearm, int? page)
+        public ActionResult Index(string searchTearm, string sortOrder, int? page)
         {
             using (var db = new MyStoreEntities())
             {
-                // Lấy danh sách sản phẩm
-                var products = db.Products.AsQueryable();
+                // Chỉ lấy sản phẩm còn hàng
+                // Chỉ lấy sản phẩm còn hàng
+                var products = db.Products
+                    .Where(p => p.Quantity > 0)
+                    .AsQueryable();
 
                 // Tìm kiếm theo tên, mô tả hoặc danh mục
                 if (!string.IsNullOrEmpty(searchTearm))
@@ -40,7 +43,7 @@ namespace _25DH110266_MyStore.Controllers
                     .ToList();
 
                 // Danh sách 20 sản phẩm ít người mua nhất
-                var newProducts = products
+                var newProductsQuery = products
                     .Select(p => new
                     {
                         Product = p,
@@ -48,8 +51,23 @@ namespace _25DH110266_MyStore.Controllers
                     })
                     .OrderBy(p => p.TotalSold)
                     .Take(20)
-                    .Select(p => p.Product)
-                    .ToList();
+                    .Select(p => p.Product);
+
+                switch (sortOrder)
+                {
+                    case "price_asc":
+                        newProductsQuery = newProductsQuery.OrderBy(p => p.ProductPrice);
+                        break;
+
+                    case "price_desc":
+                        newProductsQuery = newProductsQuery.OrderByDescending(p => p.ProductPrice);
+                        break;
+                }
+
+                var newProducts = newProductsQuery.ToList();
+
+                ViewBag.SearchTerm = searchTearm;
+                ViewBag.SortOrder = sortOrder;
 
                 // Tạo ViewModel
                 var model = new HomeProductVM
@@ -62,7 +80,9 @@ namespace _25DH110266_MyStore.Controllers
             }
         }
 
-        public ActionResult ProductList(int? id)
+
+
+        public ActionResult ProductList(int? id, string sortOrder, string searchTerm, int? page)
         {
             using (var db = new MyStoreEntities())
             {
@@ -72,17 +92,46 @@ namespace _25DH110266_MyStore.Controllers
                 }
 
                 var products = db.Products
-                    .Where(p => p.CategoryID == id)
-                    .ToList();
+                    .Where(p => p.CategoryID == id && p.Quantity > 0);
+
+                // Tìm kiếm theo tên hoặc mô tả sản phẩm
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    products = products.Where(p =>
+                        p.ProductName.Contains(searchTerm) ||
+                        p.ProductDescription.Contains(searchTerm));
+                }
+
+                // Sắp xếp sản phẩm theo giá
+                switch (sortOrder)
+                {
+                    case "price_asc":
+                        products = products.OrderBy(p => p.ProductPrice);
+                        break;
+
+                    case "price_desc":
+                        products = products.OrderByDescending(p => p.ProductPrice);
+                        break;
+
+                    default:
+                        products = products.OrderBy(p => p.ProductID);
+                        break;
+                }
 
                 ViewBag.CategoryName = db.Categories
                     .Where(c => c.CategoryID == id)
                     .Select(c => c.CategoryName)
                     .FirstOrDefault();
 
-                return View(products);
+                ViewBag.CategoryID = id;
+                ViewBag.SortOrder = sortOrder;
+                ViewBag.SearchTerm = searchTerm;
+
+                return View(products.ToPagedList(page ?? 1, 6));
             }
         }
+
+
 
         public ActionResult ProductDetail(int? id, int? page)
         {
@@ -136,6 +185,7 @@ namespace _25DH110266_MyStore.Controllers
             }
         }
 
+
         [HttpPost]
         public ActionResult AddToCart(int id, int quantity)
         {
@@ -147,11 +197,11 @@ namespace _25DH110266_MyStore.Controllers
                     "CustomerAccount");
             }
 
+            // Kiểm tra số lượng nhập vào
             if (quantity < 1)
             {
-                return RedirectToAction(
-                    "ProductDetail",
-                    new { id = id });
+                TempData["CartMessage"] = "Số lượng phải lớn hơn hoặc bằng 1!";
+                return RedirectToAction("ProductDetail", new { id = id });
             }
 
             using (var db = new MyStoreEntities())
@@ -163,6 +213,13 @@ namespace _25DH110266_MyStore.Controllers
                     return HttpNotFound();
                 }
 
+                // Kiểm tra sản phẩm còn hàng không
+                if (product.Quantity <= 0)
+                {
+                    TempData["CartMessage"] = "Sản phẩm đã hết hàng!";
+                    return RedirectToAction("ProductDetail", new { id = id });
+                }
+
                 // Lấy giỏ hàng từ Session
                 var cart = Session["Cart"] as List<CartItem>;
 
@@ -172,8 +229,21 @@ namespace _25DH110266_MyStore.Controllers
                 }
 
                 // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
-                var item = cart.FirstOrDefault(
-                    x => x.ProductID == id);
+                var item = cart.FirstOrDefault(x => x.ProductID == id);
+
+                // Tính tổng số lượng sau khi thêm
+                int currentQuantity = item != null ? item.Quantity : 0;
+                int totalQuantity = currentQuantity + quantity;
+
+                // Không cho phép vượt quá số lượng tồn kho
+                if (totalQuantity > product.Quantity)
+                {
+                    TempData["CartMessage"] =
+                        "Số lượng vượt quá tồn kho! Hiện chỉ còn "
+                        + product.Quantity + " sản phẩm.";
+
+                    return RedirectToAction("ProductDetail", new { id = id });
+                }
 
                 if (item != null)
                 {
@@ -195,12 +265,25 @@ namespace _25DH110266_MyStore.Controllers
                 Session["Cart"] = cart;
             }
 
-            TempData["CartMessage"] =
-                "Đã thêm sản phẩm vào giỏ hàng!";
+            TempData["CartMessage"] = "Đã thêm sản phẩm vào giỏ hàng!";
 
-            return RedirectToAction(
-                "ProductDetail",
-                new { id = id });
+            return RedirectToAction("ProductDetail", new { id = id });
+        }
+
+        // Hiển thị danh mục sản phẩm trên menu Customer
+        public PartialViewResult CategoryMenu()
+        {
+            using (var db = new MyStoreEntities())
+            {
+                var categories = db.Categories
+                    .OrderBy(c => c.CategoryName)
+                    .ToList();
+
+                return PartialView(
+                    "~/Views/Shared/_CategoryMenu.cshtml",
+                    categories
+                );
+            }
         }
     }
 }

@@ -8,10 +8,23 @@
 
 <h2>Xóa danh mục</h2>
 
-<div class="alert alert-warning">
-    <strong>Bạn có chắc chắn muốn xóa danh mục này không?</strong>
-    <p>Thao tác này sẽ xóa danh mục khỏi cơ sở dữ liệu.</p>
-</div>
+@if (ViewBag.ProductCount > 0)
+{
+    <div class="alert alert-danger">
+        <strong>Không thể xóa danh mục này!</strong>
+        <p>
+            Danh mục hiện có @ViewBag.ProductCount sản phẩm.
+            Vui lòng chuyển hoặc xóa các sản phẩm liên quan trước.
+        </p>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        <strong>Bạn có chắc chắn muốn xóa danh mục này không?</strong>
+        <p>Thao tác này sẽ xóa danh mục khỏi cơ sở dữ liệu.</p>
+    </div>
+}
 
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -31,10 +44,13 @@
 {
     @Html.AntiForgeryToken()
 
-    <button type="submit" class="btn btn-danger">
-        Xác nhận xóa
-    </button>
+    if (ViewBag.ProductCount == 0)
+    {
+        <button type="submit" class="btn btn-danger">
+            Xác nhận xóa
+        </button>
+    }
 
     @Html.ActionLink("Quay lại danh sách", "Index",
-        null, new { @class = "btn btn-default" })
+            null, new { @class = "btn btn-default" })
 }

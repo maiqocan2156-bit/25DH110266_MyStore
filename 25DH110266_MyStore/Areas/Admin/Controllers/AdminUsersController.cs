@@ -108,11 +108,20 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
                     "Password",
                     "Vui lòng nhập mật khẩu.");
             }
+            else if (user.Password.Length < 8)
+            {
+                ModelState.AddModelError(
+                    "Password",
+                    "Mật khẩu phải có ít nhất 8 ký tự.");
+            }
 
             user.UserRole = "Admin";
 
             if (!ModelState.IsValid)
                 return View(user);
+
+            // Băm mật khẩu trước khi lưu vào database
+            user.Password = PasswordHasher.HashPassword(user.Password);
 
             db.Users.Add(user);
 
@@ -180,9 +189,23 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
             if (user == null)
                 return HttpNotFound();
 
-            // De trong thi giu nguyen mat khau hien tai
+            // Để trống thì giữ nguyên mật khẩu hiện tại
             if (!string.IsNullOrWhiteSpace(password))
-                user.Password = password;
+            {
+
+                if (password.Length < 8)
+                {
+                    ModelState.AddModelError(
+                        "password",
+                        "Mật khẩu mới phải có ít nhất 8 ký tự.");
+
+                    user.Password = null;
+                    return View(user);
+                }
+
+                // Băm mật khẩu mới trước khi lưu
+                user.Password = PasswordHasher.HashPassword(password);
+            }
 
             try
             {

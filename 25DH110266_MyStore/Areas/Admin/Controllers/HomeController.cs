@@ -1,4 +1,4 @@
-﻿
+﻿using _25DH110266_MyStore.Areas.Admin.Filters;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
@@ -6,6 +6,7 @@ using _25DH110266_MyStore.Models;
 
 namespace _25DH110266_MyStore.Areas.Admin.Controllers
 {
+    [AdminSessionAuthorize]
     public class HomeController : Controller
     {
         private MyStoreEntities db = new MyStoreEntities();

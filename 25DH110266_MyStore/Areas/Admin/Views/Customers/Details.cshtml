@@ -1,59 +1,52 @@
-﻿@model _25DH110266_MyStore.Models.Customer
+﻿
+@model _25DH110266_MyStore.Models.Customer
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "Chi tiết khách hàng";
     Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
 }
 
-<h2>Details</h2>
+<h2>Chi tiết khách hàng</h2>
 
 <div>
-    <h4>Customer</h4>
+    <h4>Thông tin khách hàng</h4>
     <hr />
+
     <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.CustomerName)
-        </dt>
+        <dt>Mã khách hàng</dt>
+        <dd>@Model.CustomerID</dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.CustomerName)
-        </dd>
+        <dt>Họ tên</dt>
+        <dd>@Model.CustomerName</dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.CustomerPhone)
-        </dt>
+        <dt>Số điện thoại</dt>
+        <dd>@Model.CustomerPhone</dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.CustomerPhone)
-        </dd>
+        <dt>Email</dt>
+        <dd>@Model.CustomerEmail</dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.CustomerEmail)
-        </dt>
+        <dt>Địa chỉ</dt>
+        <dd>@Model.CustomerAddress</dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.CustomerEmail)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.CustomerAddress)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.CustomerAddress)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.User.Password)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.User.Password)
-        </dd>
-
+        <dt>Tên tài khoản</dt>
+        <dd>@Model.Username</dd>
     </dl>
 </div>
+
+<hr />
+
+<h3>Lịch sử đơn hàng</h3>
+
+@Html.Partial("_CustomerOrderList", Model.Orders)
+
+<hr />
+
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.CustomerID }) |
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Chỉnh sửa", "Edit",
+                new { id = Model.CustomerID },
+                new { @class = "btn btn-warning" })
+
+    @Html.ActionLink("Quay lại danh sách", "Index",
+                null,
+                new { @class = "btn btn-default" })
 </p>

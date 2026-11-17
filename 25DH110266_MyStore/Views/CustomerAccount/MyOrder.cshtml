@@ -1,0 +1,366 @@
+﻿
+@model _25DH110266_MyStore.Models.ViewModel.MyOrderVM
+@using _25DH110266_MyStore.Models
+@using System.Collections.Generic
+@using System.Linq
+
+@{
+    ViewBag.Title = "Đơn hàng của tôi";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+
+    string showMoreStatus = ViewBag.ShowMoreStatus as string ?? "";
+    string activeTab = ViewBag.ActiveTab as string ?? "all";
+    string searchTerm = Model.SearchTerm ?? "";
+}
+
+
+<style>
+    .order-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        list-style: none;
+        padding: 0;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #ddd;
+    }
+
+        .order-tabs li {
+            margin: 0;
+        }
+
+            .order-tabs li a {
+                display: block;
+                padding: 10px 18px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                background: #fff;
+                color: #333;
+                text-decoration: none;
+                transition: 0.2s;
+            }
+
+                .order-tabs li a:hover {
+                    background: #eaf2ff;
+                    border-color: #337ab7;
+                    color: #337ab7;
+                }
+
+            .order-tabs li.active a {
+                background: #337ab7;
+                border-color: #337ab7;
+                color: #fff;
+                font-weight: bold;
+            }
+</style>
+
+@helper HienThiDonHang(
+    List<_25DH110266_MyStore.Models.Order> orders,
+    string status,
+    bool showMore,
+    string activeTab,
+    string searchTerm)
+{
+    if (orders == null || orders.Count == 0)
+    {
+        <p class="text-center text-muted">
+            Không có đơn hàng nào.
+        </p>
+    }
+    else
+    {
+        foreach (var order in orders.Take(showMore ? 50 : 2))
+        {
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <strong>Đơn hàng #@order.OrderID</strong>
+                    <span class="pull-right">
+                        @order.OrderStatus
+                    </span>
+                </div>
+
+                <div class="panel-body">
+
+                    <p>
+                        Ngày đặt:
+                        @order.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                    </p>
+
+                    <p>
+                        Tổng tiền:
+                        <strong>
+                            @String.Format("{0:N0} VNĐ", order.TotalAmount)
+                        </strong>
+                    </p>
+
+                    <p>
+                        Thanh toán: @order.PaymentStatus
+                    </p>
+
+                    <hr />
+
+                    @if (order.OrderDetails != null)
+                    {
+                        foreach (var detail in order.OrderDetails)
+                        {
+                            if (detail.Product != null)
+                            {
+                                <div class="row" style="margin-bottom:15px;">
+
+                                    <div class="col-md-7">
+                                        <strong>
+                                            @detail.Product.ProductName
+                                        </strong>
+
+                                        <p>Số lượng: @detail.Quantity</p>
+
+                                        <p>
+                                            Đơn giá:
+                                            @String.Format(
+                                                     "{0:N0} VNĐ",
+                                                     detail.UnitPrice)
+                                        </p>
+                                    </div>
+
+                                    <div class="col-md-5 text-right">
+
+                                        @using (Html.BeginForm(
+                                            "Reorder",
+                                            "CustomerAccount",
+                                            FormMethod.Post,
+                                            new { style = "display:inline-block;" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="productId"
+                                                   value="@detail.ProductID" />
+
+                                            <button type="submit"
+                                                    class="btn btn-success btn-sm">
+                                                MUA LẠI
+                                            </button>
+                                        }
+
+                                    <a href="@Url.Action(
+                                        "ProductDetail",
+                                        "Home",
+                                        new { id = detail.ProductID })"
+                                       class="btn btn-info btn-sm">
+                                        XEM CHI TIẾT
+                                    </a>
+
+                                    </div>
+                                </div>
+
+                                <hr />
+                            }
+                        }
+                    }
+
+                </div>
+            </div>
+        }
+    }
+
+    if (orders != null && orders.Count > 2 && !showMore)
+    {
+        <div class="text-center" style="margin-bottom:20px;">
+
+            <a href="@Url.Action("MyOrder", "CustomerAccount",
+                new {
+                    searchTerm = searchTerm,
+                    showMoreStatus = status,
+                    activeTab = activeTab
+                })"
+               class="btn btn-default">
+                Xem thêm
+            </a>
+
+        </div>
+    }
+}
+
+<div class="container" style="margin-top:30px; margin-bottom:40px;">
+
+    <h2 class="text-center">ĐƠN HÀNG CỦA TÔI</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["Success"]
+        </div>
+    }
+
+    @using (Html.BeginForm("MyOrder", "CustomerAccount", FormMethod.Get))
+    {
+        <div class="input-group" style="margin-bottom:25px;">
+
+            <input type="text"
+                   name="searchTerm"
+                   class="form-control"
+                   placeholder="Tìm theo mã đơn hàng hoặc tên sản phẩm..."
+                   value="@Model.SearchTerm" />
+
+            <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">
+                    Tìm kiếm
+                </button>
+            </span>
+
+        </div>
+    }
+
+    @if (Model.TatCaDon == null || Model.TatCaDon.Count == 0)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            <div class="alert alert-info text-center">
+                <h4>BẠN CHƯA CÓ ĐƠN HÀNG NÀO.</h4>
+
+                <a href="@Url.Action("Index", "Home")"
+                   class="btn btn-primary">
+                    ĐẶT HÀNG NGAY
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning text-center">
+                <h4>KHÔNG TÌM THẤY ĐƠN HÀNG PHÙ HỢP.</h4>
+
+                <a href="@Url.Action("MyOrder", "CustomerAccount")"
+                   class="btn btn-default">
+                    XEM TẤT CẢ ĐƠN HÀNG
+                </a>
+
+                <a href="@Url.Action("Index", "Home")"
+                   class="btn btn-primary">
+                    VỀ TRANG CHỦ
+                </a>
+            </div>
+        }
+    }
+    else
+    {
+        <ul class="nav nav-tabs order-tabs">
+
+            <li class="@(activeTab == "all" ? "active" : "")">
+                <a href="@Url.Action("MyOrder", new {
+                    searchTerm = searchTerm,
+                    activeTab = "all"
+                })">
+                    Tất cả
+                </a>
+            </li>
+
+            <li class="@(activeTab == "pending" ? "active" : "")">
+                <a href="@Url.Action("MyOrder", new {
+                    searchTerm = searchTerm,
+                    activeTab = "pending"
+                })">
+                    Chờ thanh toán
+                </a>
+            </li>
+
+            <li class="@(activeTab == "processing" ? "active" : "")">
+                <a href="@Url.Action("MyOrder", new {
+                    searchTerm = searchTerm,
+                    activeTab = "processing"
+                })">
+                    Đang xử lý
+                </a>
+            </li>
+
+            <li class="@(activeTab == "shipping" ? "active" : "")">
+                <a href="@Url.Action("MyOrder", new {
+                    searchTerm = searchTerm,
+                    activeTab = "shipping"
+                })">
+                    Đang vận chuyển
+                </a>
+            </li>
+
+            <li class="@(activeTab == "delivered" ? "active" : "")">
+                <a href="@Url.Action("MyOrder", new {
+                    searchTerm = searchTerm,
+                    activeTab = "delivered"
+                })">
+                    Đã giao
+                </a>
+            </li>
+
+            <li class="@(activeTab == "cancelled" ? "active" : "")">
+                <a href="@Url.Action("MyOrder", new {
+                    searchTerm = searchTerm,
+                    activeTab = "cancelled"
+                })">
+                    Đã hủy
+                </a>
+            </li>
+
+        </ul>
+
+        if (activeTab == "all")
+        {
+            <h4>Chờ thanh toán</h4>
+            @HienThiDonHang(Model.ChoThanhToan, "Chờ thanh toán",
+                                   showMoreStatus == "Chờ thanh toán", activeTab, searchTerm)
+
+            <h4>Đang xử lý</h4>
+            @HienThiDonHang(Model.DangXuLy, "Đang xử lý",
+                                   showMoreStatus == "Đang xử lý", activeTab, searchTerm)
+
+            <h4>Đang vận chuyển</h4>
+            @HienThiDonHang(Model.DangVanChuyen, "Đang vận chuyển",
+                                   showMoreStatus == "Đang vận chuyển", activeTab, searchTerm)
+
+            <h4>Đã giao</h4>
+            @HienThiDonHang(Model.DaGiao, "Đã giao",
+                                   showMoreStatus == "Đã giao", activeTab, searchTerm)
+
+            <h4>Đã hủy</h4>
+            @HienThiDonHang(Model.DaHuy, "Đã hủy",
+                                   showMoreStatus == "Đã hủy", activeTab, searchTerm)
+        }
+        else if (activeTab == "pending")
+        {
+            <h4>Chờ thanh toán</h4>
+            @HienThiDonHang(Model.ChoThanhToan, "Chờ thanh toán",
+                                   showMoreStatus == "Chờ thanh toán", activeTab, searchTerm)
+        }
+        else if (activeTab == "processing")
+        {
+            <h4>Đang xử lý</h4>
+            @HienThiDonHang(Model.DangXuLy, "Đang xử lý",
+                                   showMoreStatus == "Đang xử lý", activeTab, searchTerm)
+        }
+        else if (activeTab == "shipping")
+        {
+            <h4>Đang vận chuyển</h4>
+            @HienThiDonHang(Model.DangVanChuyen, "Đang vận chuyển",
+                                   showMoreStatus == "Đang vận chuyển", activeTab, searchTerm)
+        }
+        else if (activeTab == "delivered")
+        {
+            <h4>Đã giao</h4>
+            @HienThiDonHang(Model.DaGiao, "Đã giao",
+                                   showMoreStatus == "Đã giao", activeTab, searchTerm)
+        }
+        else if (activeTab == "cancelled")
+        {
+            <h4>Đã hủy</h4>
+            @HienThiDonHang(Model.DaHuy, "Đã hủy",
+                                   showMoreStatus == "Đã hủy", activeTab, searchTerm)
+        }
+    }
+
+</div>

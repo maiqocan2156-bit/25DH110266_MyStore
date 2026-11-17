@@ -18,6 +18,7 @@
     <thead>
         <tr>
             <th>Tên danh mục</th>
+            <th>Tổng số hàng hóa</th>
             <th style="width: 240px;">Thao tác</th>
         </tr>
     </thead>
@@ -25,7 +26,14 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryName)
+                </td>
+
+                <td>
+                    @(item.Products != null ? item.Products.Count : 0)
+                </td>
+
                 <td>
                     @Html.ActionLink("Sửa", "Edit", new { id = item.CategoryID },
                         new { @class = "btn btn-warning btn-sm" })

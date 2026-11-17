@@ -143,6 +143,7 @@
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\OrdersController.cs" />
     <Compile Include="Areas\Admin\Controllers\ProductsController.cs" />
+    <Compile Include="Areas\Admin\Controllers\WarehouseController.cs" />
     <Compile Include="Areas\Admin\Filters\AdminSessionAuthorizeAttribute.cs" />
     <Compile Include="Controllers\CartController.cs" />
     <Compile Include="Controllers\CustomerAccountController.cs" />
@@ -178,6 +179,7 @@
     <Compile Include="Models\OrderDetail.cs">
       <DependentUpon>MyStoreModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\PasswordHasher.cs" />
     <Compile Include="Models\Product.cs">
       <DependentUpon>MyStoreModel.tt</DependentUpon>
     </Compile>
@@ -191,7 +193,9 @@
     <Compile Include="Models\ViewModel\CartItem.cs" />
     <Compile Include="Models\ViewModel\ChangePasswordVM.cs" />
     <Compile Include="Models\ViewModel\HomeProductVM.cs" />
+    <Compile Include="Models\ViewModel\MyOrderVM.cs" />
     <Compile Include="Models\ViewModel\ProductDetailVM.cs" />
+    <Compile Include="Models\ViewModel\ProductInventoryViewModel.cs" />
     <Compile Include="Models\ViewModel\RegisterVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -271,6 +275,10 @@
     <Content Include="Areas\Admin\Views\AdminUsers\Details.cshtml" />
     <Content Include="Areas\Admin\Views\AdminUsers\Delete.cshtml" />
     <Content Include="Areas\Admin\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\UpdateStatus.cshtml" />
+    <Content Include="Areas\Admin\Views\Warehouse\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Products\Inventory.cshtml" />
+    <Content Include="Areas\Admin\Views\Products\_InventoryProductList.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -311,6 +319,10 @@
     <Content Include="Views\CustomerAccount\ProfileInfo.cshtml" />
     <Content Include="Views\CustomerAccount\UpdateProfile.cshtml" />
     <Content Include="Views\CustomerAccount\ChangePassword.cshtml" />
+    <Content Include="Views\CustomerAccount\MyOrder.cshtml" />
+    <Content Include="Views\Shared\_CategoryMenu.cshtml" />
+    <Content Include="Views\Shared\_OrderDetailsList.cshtml" />
+    <Content Include="Views\Shared\_CustomerOrderList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

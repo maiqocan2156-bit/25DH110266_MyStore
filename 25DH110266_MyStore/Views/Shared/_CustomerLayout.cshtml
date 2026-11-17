@@ -71,7 +71,7 @@
                         @Html.ActionLink("Trang chủ", "Index", "Home")
                     </li>
                     <li>
-                        @Html.ActionLink("Sản phẩm", "ProductList", "Home")
+                        @Html.Action("CategoryMenu", "Home")
                     </li>
                 </ul>
 
@@ -82,6 +82,16 @@
 
                     @if (Session["CustomerID"] != null)
                     {
+                        <li>
+                            @Html.ActionLink(
+                                "Lịch sử mua hàng",
+                                "MyOrder",
+                                "CustomerAccount",
+                                new { area = "" },
+                                null
+                            )
+                        </li>
+
                         <li>
                             @Html.ActionLink(
                                 "Thông tin cá nhân",
@@ -138,9 +148,10 @@
             <p>&copy; @DateTime.Now.Year - MyStore</p>
         </div>
     </footer>
-
     @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+
+    <script src="@Url.Content("~/Scripts/bootstrap.bundle.min.js")"></script>
+
     @RenderSection("scripts", required: false)
 </body>
 </html>

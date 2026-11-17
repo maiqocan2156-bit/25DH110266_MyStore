@@ -1,0 +1,32 @@
+﻿
+@model IEnumerable<_25DH110266_MyStore.Models.Category>
+
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        Danh mục <span class="caret"></span>
+    </a>
+
+    <ul class="dropdown-menu">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var category in Model)
+            {
+                <li>
+                    @Html.ActionLink(
+                             category.CategoryName,
+                             "ProductList",
+                             "Home",
+                             new { id = category.CategoryID },
+                             null
+                         )
+                </li>
+            }
+        }
+        else
+        {
+            <li>
+                <a href="#">Chưa có danh mục</a>
+            </li>
+        }
+    </ul>
+</li>

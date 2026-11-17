@@ -14,7 +14,8 @@
             <div class="card-body">
                 <p><strong>Mã đơn hàng:</strong> #@order.OrderID</p>
                 <p><strong>Ngày đặt:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
-                <p><strong>Trạng thái:</strong> @order.PaymentStatus</p>
+                <p><strong>Trạng thái đơn hàng:</strong> @order.OrderStatus</p>
+                <p><strong>Trạng thái thanh toán:</strong> @order.PaymentStatus</p>
                 <p><strong>Địa chỉ giao hàng:</strong> @order.AddressDelivery</p>
                 <p><strong>Hình thức giao hàng:</strong> @order.DeliveryMethod</p>
                 <p><strong>Phương thức thanh toán:</strong> @order.PaymentMethod</p>
@@ -37,17 +38,22 @@
                 {
                     <tr>
                         <td>
-                            <img src="@Url.Content("~/Content/images/" + item.Product.ProductImage)"
-                                 alt="@item.Product.ProductName"
-                                 style="width:80px;height:80px;object-fit:contain;" />
+                            @if (item.Product != null)
+                            {
+                                <img src="@Url.Content("~/Content/images/" + item.Product.ProductImage)"
+                                     alt="@item.Product.ProductName"
+                                     style="width:80px;height:80px;object-fit:contain;" />
+                            }
                         </td>
 
-                        <td>@item.Product.ProductName</td>
+                        <td>
+                            @(item.Product != null
+                    ? item.Product.ProductName
+                    : "Sản phẩm không còn tồn tại")
+                        </td>
 
                         <td>@item.UnitPrice.ToString("N0") đ</td>
-
                         <td>@item.Quantity</td>
-
                         <td>@((item.UnitPrice * item.Quantity).ToString("N0")) đ</td>
                     </tr>
                 }
@@ -60,8 +66,8 @@
         </h4>
     }
 
-    <a href="@Url.Action("OrderHistory", "Cart")"
-       class="btn btn-secondary mt-3">
-        Quay lại lịch sử đơn hàng
-    </a>
+        <a href="@Url.Action("MyOrder", "CustomerAccount")"
+           class="btn btn-secondary mt-3">
+            Quay lại lịch sử mua hàng
+        </a>
 </div>

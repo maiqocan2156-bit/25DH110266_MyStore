@@ -8,10 +8,27 @@
 
 <h2>Xóa sản phẩm</h2>
 
-<div class="alert alert-warning">
-    <strong>Bạn có chắc chắn muốn xóa sản phẩm này không?</strong>
-    <p>Thao tác này sẽ xóa sản phẩm khỏi cơ sở dữ liệu.</p>
-</div>
+@if (TempData["DeleteError"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["DeleteError"]
+    </div>
+}
+
+@if (ViewBag.HasOrders)
+{
+    <div class="alert alert-danger">
+        <strong>Không thể xóa sản phẩm này!</strong>
+        <p>Sản phẩm đã tồn tại trong đơn hàng.</p>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        <strong>Bạn có chắc chắn muốn xóa sản phẩm này không?</strong>
+        <p>Thao tác này sẽ xóa sản phẩm khỏi cơ sở dữ liệu.</p>
+    </div>
+}
 
 @Html.Partial("PVProductInfo", Model)
 
@@ -20,10 +37,13 @@
 {
     @Html.AntiForgeryToken()
 
-    <button type="submit" class="btn btn-danger">
-        Xác nhận xóa
-    </button>
+    if (!(ViewBag.HasOrders ?? false))
+    {
+        <button type="submit" class="btn btn-danger">
+            Xác nhận xóa
+        </button>
+    }
 
     @Html.ActionLink("Quay lại danh sách", "Index",
-        null, new { @class = "btn btn-default" })
+            null, new { @class = "btn btn-default" })
 }

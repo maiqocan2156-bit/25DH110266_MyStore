@@ -1,4 +1,4 @@
-﻿
+﻿using System.Data.Entity.Validation;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,9 +9,12 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using _25DH110266_MyStore.Models;
+using _25DH110266_MyStore.Areas.Admin.Filters;
+using _25DH110266_MyStore.Models.ViewModel;
 
 namespace _25DH110266_MyStore.Areas.Admin.Controllers
 {
+    [AdminSessionAuthorize]
     public class ProductsController : Controller
     {
         private MyStoreEntities db = new MyStoreEntities();
@@ -24,7 +27,7 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
             decimal? maxPrice,
             int page = 1)
         {
-            int pageSize = 5;
+            int pageSize = 10;
 
             ViewBag.CurrentSort = sortOrder;
             ViewBag.NameSortParm =
@@ -149,6 +152,29 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
             return View(result);
         }
 
+        // GET: Admin/Products/Inventory
+        public ActionResult Inventory()
+        {
+            var viewModel = new ProductInventoryViewModel
+            {
+                // Danh sách hàng tồn
+                StockProducts = db.Products
+                    .Include(p => p.Category)
+                    .Where(p => p.Quantity > 0)
+                    .OrderBy(p => p.ProductName)
+                    .ToList(),
+
+                // Danh sách hàng cần nhập
+                NeedRestockProducts = db.Products
+                    .Include(p => p.Category)
+                    .Where(p => p.Quantity == 0)
+                    .OrderBy(p => p.ProductName)
+                    .ToList()
+            };
+
+            return View(viewModel);
+        }
+
         // GET: Admin/Products/Details/5
         public ActionResult Details(int? id)
         {
@@ -186,10 +212,46 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(
             [Bind(Include =
-                "ProductID,CategoryID,ProductName,ProductPrice,ProductDescription")]
+                "ProductID,CategoryID,ProductName,ProductPrice,ProductDescription,Quantity")]
             Product product,
             HttpPostedFileBase uploadImage)
         {
+            if (ModelState["CategoryID"] != null &&
+                ModelState["CategoryID"].Errors.Count > 0)
+            {
+                ModelState["CategoryID"].Errors.Clear();
+
+                ModelState.AddModelError(
+                    "CategoryID",
+                    "Vui lòng chọn danh mục sản phẩm."
+                );
+            }
+
+            if (product.ProductPrice <= 0 &&
+                !String.IsNullOrWhiteSpace(Request.Form["ProductPrice"]))
+            {
+                ModelState.AddModelError(
+                    "ProductPrice",
+                    "Giá sản phẩm phải lớn hơn 0."
+                );
+            }
+
+            if (product.CategoryID <= 0)
+            {
+                ModelState.AddModelError(
+                    "CategoryID",
+                    "Vui lòng chọn danh mục sản phẩm."
+                );
+            }
+
+            if (product.Quantity < 0)
+            {
+                ModelState.AddModelError(
+                    "Quantity",
+                    "Số lượng tồn kho không được nhỏ hơn 0."
+                );
+            }
+
             if (ModelState.IsValid)
             {
                 if (uploadImage == null ||
@@ -241,7 +303,19 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
                         product.ProductImage = fileName;
 
                         db.Products.Add(product);
-                        db.SaveChanges();
+
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (DbEntityValidationException ex)
+                        {
+                            var errors = ex.EntityValidationErrors
+                                .SelectMany(x => x.ValidationErrors)
+                                .Select(x => x.PropertyName + ": " + x.ErrorMessage);
+
+                            throw new Exception(string.Join(" | ", errors), ex);
+                        }
 
                         return RedirectToAction("Index");
                     }
@@ -290,10 +364,18 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(
             [Bind(Include =
-                "ProductID,CategoryID,ProductName,ProductPrice,ProductDescription")]
+                "ProductID,CategoryID,ProductName,ProductPrice,ProductDescription,Quantity")]
             Product product,
             HttpPostedFileBase uploadImage)
         {
+            if (product.Quantity < 0)
+            {
+                ModelState.AddModelError(
+                    "Quantity",
+                    "Số lượng tồn kho không được nhỏ hơn 0."
+                );
+            }
+
             if (ModelState.IsValid)
             {
                 Product existingProduct =
@@ -309,6 +391,7 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
                 existingProduct.ProductPrice = product.ProductPrice;
                 existingProduct.ProductDescription =
                     product.ProductDescription;
+                existingProduct.Quantity = product.Quantity;
 
                 if (uploadImage != null &&
                     uploadImage.ContentLength > 0)
@@ -380,12 +463,17 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
                 );
             }
 
-            Product product = db.Products.Find(id);
+            Product product = db.Products
+                .Include(p => p.OrderDetails)
+                .FirstOrDefault(p => p.ProductID == id);
 
             if (product == null)
             {
                 return HttpNotFound();
             }
+
+            ViewBag.HasOrders = product.OrderDetails != null
+                && product.OrderDetails.Any();
 
             return View(product);
         }
@@ -395,11 +483,22 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Product product = db.Products.Find(id);
+            Product product = db.Products
+                .Include(p => p.OrderDetails)
+                .FirstOrDefault(p => p.ProductID == id);
 
             if (product == null)
             {
                 return HttpNotFound();
+            }
+
+            if (product.OrderDetails != null &&
+                product.OrderDetails.Any())
+            {
+                TempData["DeleteError"] =
+                    "Không thể xóa sản phẩm vì sản phẩm đã có trong đơn hàng.";
+
+                return RedirectToAction("Delete", new { id = id });
             }
 
             db.Products.Remove(product);

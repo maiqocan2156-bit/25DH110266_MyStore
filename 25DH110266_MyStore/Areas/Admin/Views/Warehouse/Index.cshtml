@@ -1,0 +1,133 @@
+﻿
+@model Tuple<List<_25DH110266_MyStore.Models.Product>, List<_25DH110266_MyStore.Models.Product>>
+
+@{
+    ViewBag.Title = "Quản lý kho hàng";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+}
+
+<h2>Quản lý kho hàng</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Tổng sản phẩm</div>
+            <div class="panel-body text-center">
+                <h3>@ViewBag.TotalProducts</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-success">
+            <div class="panel-heading">Còn hàng</div>
+            <div class="panel-body text-center">
+                <h3>@ViewBag.InStock</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-danger">
+            <div class="panel-heading">Hết hàng</div>
+            <div class="panel-body text-center">
+                <h3>@ViewBag.OutOfStock</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<h4>Tìm kiếm và lọc sản phẩm</h4>
+
+@using (Html.BeginForm("Index", "Warehouse", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-md-5">
+            <input type="text" name="searchString"
+                   value="@ViewBag.SearchString"
+                   class="form-control"
+                   placeholder="Nhập tên sản phẩm cần tìm..." />
+        </div>
+
+        <div class="col-md-3">
+            <select name="filter" class="form-control">
+                <option value="">Tất cả sản phẩm</option>
+                <option value="in" @(ViewBag.Filter == "in" ? "selected" : "")>Còn hàng</option>
+                <option value="out" @(ViewBag.Filter == "out" ? "selected" : "")>Hết hàng</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        </div>
+
+        <div class="col-md-2">
+            @Html.ActionLink("Làm mới", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    </div>
+}
+
+<br />
+
+<h4>Danh sách hàng tồn</h4>
+
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>Tên sản phẩm</th>
+        <th>Danh mục</th>
+        <th>Giá</th>
+        <th>Số lượng tồn</th>
+    </tr>
+
+    @if (Model.Item1 != null && Model.Item1.Count > 0)
+    {
+        foreach (var item in Model.Item1)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@(item.Category != null ? item.Category.CategoryName : "")</td>
+                <td>@String.Format("{0:N0} VNĐ", item.ProductPrice)</td>
+                <td>@item.Quantity</td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="4" class="text-center">Không có sản phẩm tồn kho.</td>
+        </tr>
+    }
+</table>
+
+<h4>Danh sách hàng cần nhập</h4>
+
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>Tên sản phẩm</th>
+        <th>Danh mục</th>
+        <th>Giá</th>
+        <th>Số lượng tồn</th>
+    </tr>
+
+    @if (Model.Item2 != null && Model.Item2.Count > 0)
+    {
+        foreach (var item in Model.Item2)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@(item.Category != null ? item.Category.CategoryName : "")</td>
+                <td>@String.Format("{0:N0} VNĐ", item.ProductPrice)</td>
+                <td>@item.Quantity</td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="4" class="text-center">Không có sản phẩm cần nhập.</td>
+        </tr>
+    }
+</table>

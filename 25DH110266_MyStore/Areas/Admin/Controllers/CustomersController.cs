@@ -1,4 +1,4 @@
-﻿
+﻿using _25DH110266_MyStore.Areas.Admin.Filters;
 using System;
 using System.Data;
 using System.Data.Entity;
@@ -9,6 +9,7 @@ using _25DH110266_MyStore.Models;
 
 namespace _25DH110266_MyStore.Areas.Admin.Controllers
 {
+    [AdminSessionAuthorize]
     public class CustomersController : Controller
     {
         private MyStoreEntities db = new MyStoreEntities();
@@ -82,6 +83,7 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
 
             Customer customer = db.Customers
                 .Include(c => c.User)
+                .Include(c => c.Orders.Select(o => o.OrderDetails.Select(d => d.Product)))
                 .FirstOrDefault(c => c.CustomerID == id);
 
             if (customer == null)

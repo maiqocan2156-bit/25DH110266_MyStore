@@ -1,0 +1,46 @@
+﻿@model _25DH110266_MyStore.Models.Order
+
+@{
+    ViewBag.Title = "Cập nhật trạng thái đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+}
+
+<h2>Cập nhật trạng thái đơn hàng</h2>
+
+<hr />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Đơn hàng #@Model.OrderID</h4>
+    </div>
+
+    <div class="panel-body">
+        @using (Html.BeginForm("UpdateStatus", "Orders", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.HiddenFor(m => m.OrderID)
+
+            <div class="form-group">
+                <label>Trạng thái đơn hàng</label>
+
+                @Html.DropDownList(
+                         "OrderStatus",
+                         (SelectList)ViewBag.OrderStatuses,
+                         new { @class = "form-control" }
+                     )
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Lưu trạng thái
+            </button>
+
+            @Html.ActionLink(
+                     "Quay lại",
+                     "Details",
+                     new { id = Model.OrderID },
+                     new { @class = "btn btn-default" }
+                 )
+        }
+    </div>
+</div>

@@ -1,0 +1,17 @@
+﻿@model _25DH110266_MyStore.Models.ViewModel.ProductInventoryViewModel
+
+@{
+    ViewBag.Title = "Quản lý kho hàng";
+    Layout = "~/Areas/Admin/Views/Shared/AdminLayout.cshtml";
+}
+
+<h2>QUẢN LÝ KHO HÀNG</h2>
+<hr />
+
+<h4>Danh sách hàng tồn</h4>
+@Html.Partial("_InventoryProductList", Model.StockProducts)
+
+<hr />
+
+<h4>Danh sách hàng cần nhập</h4>
+@Html.Partial("_InventoryProductList", Model.NeedRestockProducts)

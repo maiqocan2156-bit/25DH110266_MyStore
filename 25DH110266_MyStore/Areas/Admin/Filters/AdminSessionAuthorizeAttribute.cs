@@ -21,7 +21,7 @@ namespace _25DH110266_MyStore.Areas.Admin.Filters
 
             return !string.IsNullOrWhiteSpace(username)
                 && string.Equals(
-                    role,
+                    role?.Trim(),
                     "Admin",
                     StringComparison.OrdinalIgnoreCase);
         }

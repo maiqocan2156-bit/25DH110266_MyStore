@@ -22,6 +22,44 @@
     </div>
 </div>
 
+<hr />
+
+<h3>Danh sách sản phẩm thuộc danh mục</h3>
+
+@if (Model.Products != null && Model.Products.Any())
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Tên sản phẩm</th>
+                <th>Giá bán</th>
+                <th>Số lượng tồn</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.Products)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+
+                    <td>
+                        @item.ProductPrice.ToString("N0") VNĐ
+                    </td>
+
+                    <td>@item.Quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        Danh mục này chưa có sản phẩm nào.
+    </div>
+}
+
 <p>
     @Html.ActionLink("Chỉnh sửa", "Edit",
         new { id = Model.CategoryID },

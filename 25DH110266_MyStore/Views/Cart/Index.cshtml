@@ -3,11 +3,20 @@
 
 @{
     ViewBag.Title = "Giỏ hàng";
-    decimal grandTotal = Model.Sum(x => x.Total);
+    decimal grandTotal = Model == null
+    ? 0
+    : Model.Sum(x => x.Quantity * x.ProductPrice);
 }
 
 <div class="container mt-5 mb-5">
     <h2 class="mb-4">GIỎ HÀNG CỦA BẠN</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
 
     @if (Model == null || !Model.Any())
     {
@@ -72,7 +81,7 @@
                                                name="quantity"
                                                value="@item.Quantity"
                                                min="1"
-                                               class="form-control"
+                                               class="form-control cart-quantity"
                                                style="width:80px;" />
 
                                         <button type="submit"
@@ -84,7 +93,9 @@
                             </td>
 
                             <td>
-                                @item.Total.ToString("N0") đ
+                                <span class="cart-line-total">
+                                    @((item.Quantity * item.ProductPrice).ToString("N0")) đ
+                                </span>
                             </td>
 
                             <td>
@@ -197,7 +208,7 @@
 
             selectedProducts.innerHTML = "";
 
-            document.querySelectorAll(".cart-select:checked")
+            document.querySelectorAll(".cart-select")
                 .forEach(function (checkbox) {
 
                     var row = checkbox.closest("tr");
@@ -206,27 +217,54 @@
                         checkbox.getAttribute("data-price")
                     );
 
-                    var quantity = parseInt(
-                        row.querySelector('input[name="quantity"]').value
-                    );
+                    var quantityInput =
+                        row.querySelector(".cart-quantity");
 
-                    total += price * quantity;
+                    var quantity = parseInt(quantityInput.value) || 1;
 
-                    var hiddenInput = document.createElement("input");
-                    hiddenInput.type = "hidden";
-                    hiddenInput.name = "selectedProductIds";
-                    hiddenInput.value = checkbox.value;
+                    // Cập nhật thành tiền từng sản phẩm
+                    var lineTotal = price * quantity;
 
-                    selectedProducts.appendChild(hiddenInput);
+                    row.querySelector(".cart-line-total").innerText =
+                        lineTotal.toLocaleString("vi-VN") + " đ";
+
+                    // Chỉ cộng sản phẩm được chọn
+                    if (checkbox.checked) {
+                        total += lineTotal;
+
+                        var hiddenInput =
+                            document.createElement("input");
+
+                        hiddenInput.type = "hidden";
+                        hiddenInput.name = "selectedProductIds";
+                        hiddenInput.value = checkbox.value;
+
+                        selectedProducts.appendChild(hiddenInput);
+                    }
                 });
 
             document.getElementById("selectedTotal").innerText =
                 total.toLocaleString("vi-VN") + " đ";
         }
 
+        // Khi tích hoặc bỏ tích sản phẩm
         document.querySelectorAll(".cart-select")
             .forEach(function (checkbox) {
                 checkbox.addEventListener("change", calculateSelectedTotal);
+            });
+
+        // Khi thay đổi số lượng
+        document.querySelectorAll(".cart-quantity")
+            .forEach(function (input) {
+
+                input.addEventListener("input", function () {
+
+                    if (this.value === "" || parseInt(this.value) < 1) {
+                        return;
+                    }
+
+                    calculateSelectedTotal();
+                });
             });
 
         calculateSelectedTotal();

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<_25DH110266_MyStore.Models.Product>
+
+@if (Model == null || !Model.Any())
+{
+    <p class="text-muted">Không có sản phẩm trong danh sách này.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Tên sản phẩm</th>
+                <th>Hình ảnh</th>
+                <th>Giá</th>
+                <th>Số lượng tồn</th>
+                <th>Danh mục</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.ProductImage))
+                        {
+                            <img src="@(item.ProductImage.StartsWith("http")
+                                ? item.ProductImage
+                                : Url.Content("~/Content/images/" + item.ProductImage))"
+                                 style="width:70px;height:70px;object-fit:cover;" />
+                        }
+                    </td>
+                    <td>@item.ProductPrice.ToString("N0") đ</td>
+                    <td>@item.Quantity</td>
+                    <td>
+                        @(item.Category != null
+                        ? item.Category.CategoryName
+                        : "Chưa phân loại")
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

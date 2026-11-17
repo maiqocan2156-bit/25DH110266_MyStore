@@ -63,35 +63,45 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
                     return View();
                 }
 
-                // Kiểm tra mật khẩu
+                System.Diagnostics.Debug.WriteLine(
+                    "USERNAME: [" + user.Username + "]");
+
+                System.Diagnostics.Debug.WriteLine(
+                    "USERROLE: [" + user.UserRole + "]");
+
+                System.Diagnostics.Debug.WriteLine(
+                    "ROLE LENGTH: " + (user.UserRole ?? "").Length);
+
+                // Kiểm tra và tự động nâng cấp mật khẩu cũ
                 if (user.Password == null)
                 {
-                    ViewBag.Error =
-                        "Mật khẩu trong cơ sở dữ liệu đang bị null.";
-
+                    ViewBag.Error = "Mật khẩu không chính xác.";
                     return View();
                 }
 
-                if (!string.Equals(
-                    user.Password,
-                    password,
-                    StringComparison.Ordinal))
+                if (user.Password.StartsWith(
+                    "PBKDF2$", StringComparison.Ordinal))
                 {
-                    if (string.Equals(
-                        user.Password.Trim(),
-                        password.Trim(),
-                        StringComparison.Ordinal))
+                    // Tài khoản đã mã hóa
+                    if (!PasswordHasher.VerifyPassword(password, user.Password))
                     {
-                        ViewBag.Error =
-                            "Mật khẩu có khoảng trắng thừa. " +
-                            "Vui lòng kiểm tra dữ liệu.";
-
+                        ViewBag.Error = "Mật khẩu không chính xác.";
+                        return View();
+                    }
+                }
+                else
+                {
+                    // Tài khoản đang dùng mật khẩu cũ
+                    if (!string.Equals(
+                        user.Password, password, StringComparison.Ordinal))
+                    {
+                        ViewBag.Error = "Mật khẩu không chính xác.";
                         return View();
                     }
 
-                    ViewBag.Error = "Mật khẩu không chính xác.";
-
-                    return View();
+                    // Mã hóa lại và lưu vào database
+                    user.Password = PasswordHasher.HashPassword(password);
+                    db.SaveChanges();
                 }
 
                 // Kiểm tra quyền quản trị
@@ -110,6 +120,12 @@ namespace _25DH110266_MyStore.Areas.Admin.Controllers
                 Session.Clear();
                 Session["Username"] = user.Username;
                 Session["UserRole"] = user.UserRole;
+
+                System.Diagnostics.Debug.WriteLine(
+                    "LOGIN SUCCESS: " + Session["Username"]);
+
+                System.Diagnostics.Debug.WriteLine(
+                    "SESSION ROLE: [" + Session["UserRole"] + "]");
 
                 return RedirectToAction(
                     "Index",

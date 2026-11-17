@@ -167,14 +167,15 @@
     )
 </p>
 
+
 <div class="table-responsive">
     <table class="table table-bordered table-striped table-hover">
         <thead>
             <tr class="active">
                 <th>Tên sản phẩm</th>
-                <th>Giá sản phẩm</th>
                 <th>Hình ảnh</th>
-                <th>Mô tả</th>
+                <th>Giá sản phẩm</th>
+                <th>Số lượng tồn</th>
                 <th>Danh mục</th>
                 <th style="min-width: 160px;">Thao tác</th>
             </tr>
@@ -187,10 +188,6 @@
                 {
                     <tr>
                         <td>@item.ProductName</td>
-
-                        <td>
-                            @item.ProductPrice.ToString("N0") VNĐ
-                        </td>
 
                         <td>
                             @if (!String.IsNullOrWhiteSpace(item.ProductImage))
@@ -210,7 +207,13 @@
                             }
                         </td>
 
-                        <td>@item.ProductDescription</td>
+                        <td>
+                            @item.ProductPrice.ToString("N0") VNĐ
+                        </td>
+
+                        <td>
+                            @item.Quantity
+                        </td>
 
                         <td>
                             @(item.Category != null
@@ -223,11 +226,7 @@
                                 "Sửa",
                                 "Edit",
                                 "Products",
-                                new
-                                {
-                                    area = "Admin",
-                                    id = item.ProductID
-                                },
+                                new { area = "Admin", id = item.ProductID },
                                 new { @class = "btn btn-warning btn-sm" }
                             )
 
@@ -235,11 +234,7 @@
                                 "Chi tiết",
                                 "Details",
                                 "Products",
-                                new
-                                {
-                                    area = "Admin",
-                                    id = item.ProductID
-                                },
+                                new { area = "Admin", id = item.ProductID },
                                 new { @class = "btn btn-info btn-sm" }
                             )
 
@@ -247,11 +242,7 @@
                                 "Xóa",
                                 "Delete",
                                 "Products",
-                                new
-                                {
-                                    area = "Admin",
-                                    id = item.ProductID
-                                },
+                                new { area = "Admin", id = item.ProductID },
                                 new { @class = "btn btn-danger btn-sm" }
                             )
                         </td>
@@ -269,6 +260,7 @@
         </tbody>
     </table>
 </div>
+
 
 @if (ViewBag.TotalPages != null &&
     (int)ViewBag.TotalPages > 1)

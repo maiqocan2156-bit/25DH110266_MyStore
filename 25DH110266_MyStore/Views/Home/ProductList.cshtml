@@ -1,19 +1,73 @@
-﻿@model IEnumerable<_25DH110266_MyStore.Models.Product>
+﻿
+@model PagedList.IPagedList<_25DH110266_MyStore.Models.Product>
+@using PagedList.Mvc
+@using PagedList
 
 @{
     ViewBag.Title = "Danh sách sản phẩm";
 }
 
 <div class="container mt-4">
+
     <h2>@(ViewBag.CategoryName ?? "Danh sách sản phẩm")</h2>
 
+    @using (Html.BeginForm("ProductList", "Home", FormMethod.Get))
+    {
+        <input type="hidden" name="id" value="@ViewBag.CategoryID" />
+
+        <div class="row mb-3">
+
+            <div class="col-md-5">
+                <input type="text"
+                       name="searchTerm"
+                       value="@ViewBag.SearchTerm"
+                       class="form-control"
+                       placeholder="Tìm kiếm sản phẩm..." />
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">
+                    Tìm kiếm
+                </button>
+            </div>
+
+        </div>
+    }
+
+    <div class="mb-3">
+
+        <label>Sắp xếp theo giá:</label>
+
+        <select class="form-control"
+                style="width:200px; display:inline-block;"
+                onchange="location.href='@Url.Action("ProductList", "Home", new { id = ViewBag.CategoryID, searchTerm = ViewBag.SearchTerm })&sortOrder=' + this.value;">
+
+            <option value="" @(ViewBag.SortOrder == null || ViewBag.SortOrder == "" ? "selected" : "")>
+                Mặc định
+            </option>
+
+            <option value="price_asc" @(ViewBag.SortOrder == "price_asc" ? "selected" : "")>
+                Giá tăng dần
+            </option>
+
+            <option value="price_desc" @(ViewBag.SortOrder == "price_desc" ? "selected" : "")>
+                Giá giảm dần
+            </option>
+
+        </select>
+
+    </div>
+
     <div class="row">
+
         @if (Model != null && Model.Any())
         {
             foreach (var item in Model)
             {
                 <div class="col-md-4 mb-4">
+
                     <div class="card h-100">
+
                         @if (!string.IsNullOrEmpty(item.ProductImage))
                         {
                             <img src="@(item.ProductImage.StartsWith("http")
@@ -25,8 +79,11 @@
                         }
 
                         <div class="card-body">
+
                             <h5>@item.ProductName</h5>
+
                             <p>@item.ProductDescription</p>
+
                             <p class="text-danger">
                                 @String.Format("{0:N0} đ", item.ProductPrice)
                             </p>
@@ -36,14 +93,38 @@
                                class="btn btn-primary">
                                 Xem chi tiết
                             </a>
+
                         </div>
+
                     </div>
+
                 </div>
             }
         }
         else
         {
-            <p>Danh mục này chưa có sản phẩm.</p>
+            <div class="col-12">
+                <p class="text-danger">
+                    Không tìm thấy sản phẩm phù hợp.
+                </p>
+            </div>
         }
+
     </div>
+
+    <div class="text-center">
+
+        @Html.PagedListPager(
+                 Model,
+                 page => Url.Action("ProductList", "Home", new
+                 {
+                     id = ViewBag.CategoryID,
+                     sortOrder = ViewBag.SortOrder,
+                     searchTerm = ViewBag.SearchTerm,
+                     page = page
+                 })
+             )
+
+    </div>
+
 </div>

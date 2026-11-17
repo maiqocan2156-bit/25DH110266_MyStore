@@ -63,9 +63,7 @@ namespace _25DH110266_MyStore.Controllers
         {
             if (Session["CustomerID"] == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "CustomerAccount");
+                return RedirectToAction("Login", "CustomerAccount");
             }
 
             var cart = Session["Cart"] as List<CartItem>;
@@ -75,21 +73,37 @@ namespace _25DH110266_MyStore.Controllers
                 return RedirectToAction("Index");
             }
 
-            var item = cart.FirstOrDefault(
-                x => x.ProductID == id);
+            var item = cart.FirstOrDefault(x => x.ProductID == id);
 
             if (item != null)
             {
                 if (quantity < 1)
                 {
-                    ModelState.AddModelError(
-                        "",
-                        "Số lượng phải lớn hơn 0.");
+                    TempData["Error"] = "Số lượng phải lớn hơn 0.";
                 }
                 else
                 {
-                    item.Quantity = quantity;
-                    Session["Cart"] = cart;
+                    using (var db = new MyStoreEntities())
+                    {
+                        var product = db.Products.Find(id);
+
+                        if (product == null)
+                        {
+                            TempData["Error"] = "Không tìm thấy sản phẩm.";
+                        }
+                        else if (quantity > product.Quantity)
+                        {
+                            TempData["Error"] =
+                                "Số lượng vượt quá tồn kho! Hiện chỉ còn "
+                                + product.Quantity + " sản phẩm.";
+                        }
+                        else
+                        {
+                            item.Quantity = quantity;
+                            Session["Cart"] = cart;
+                            TempData["Success"] = "Cập nhật số lượng thành công.";
+                        }
+                    }
                 }
             }
 
@@ -161,6 +175,8 @@ namespace _25DH110266_MyStore.Controllers
             int customerId = (int)Session["CustomerID"];
 
             using (var db = new MyStoreEntities())
+            using (var transaction = db.Database.BeginTransaction(
+                System.Data.IsolationLevel.Serializable))
             {
                 // Lấy thông tin khách hàng
                 var customer = db.Customers.Find(customerId);
@@ -171,6 +187,27 @@ namespace _25DH110266_MyStore.Controllers
                     return RedirectToAction("Index");
                 }
 
+                // Kiểm tra số lượng tồn kho trước khi đặt hàng
+                foreach (var item in selectedItems)
+                {
+                    var product = db.Products.Find(item.ProductID);
+
+                    if (product == null)
+                    {
+                        TempData["Error"] = "Không tìm thấy sản phẩm.";
+                        return RedirectToAction("Index");
+                    }
+
+                    if (item.Quantity < 1 || product.Quantity < item.Quantity)
+                    {
+                        TempData["Error"] =
+                            "Sản phẩm " + product.ProductName +
+                            " không đủ số lượng tồn kho.";
+
+                        return RedirectToAction("Index");
+                    }
+                }
+
                 // Tạo đơn hàng
                 var order = new Order
                 {
@@ -179,6 +216,7 @@ namespace _25DH110266_MyStore.Controllers
                     TotalAmount = selectedItems.Sum(x => x.Total),
 
                     PaymentStatus = "Chưa thanh toán",
+                    OrderStatus = "Chờ thanh toán",
 
                     AddressDelivery = string.IsNullOrEmpty(addressDelivery)
                         ? (string.IsNullOrEmpty(customer.CustomerAddress)
@@ -206,9 +244,17 @@ namespace _25DH110266_MyStore.Controllers
                         string.Join("\n", errors), ex);
                 }
 
-                // Lưu chi tiết đơn hàng
+                // Lưu chi tiết đơn hàng và trừ số lượng tồn kho
                 foreach (var item in selectedItems)
                 {
+                    var product = db.Products.Find(item.ProductID);
+
+                    if (product == null || product.Quantity < item.Quantity)
+                    {
+                        throw new Exception(
+                            "Số lượng tồn kho không đủ để hoàn tất đơn hàng.");
+                    }
+
                     var detail = new OrderDetail
                     {
                         OrderID = order.OrderID,
@@ -219,9 +265,15 @@ namespace _25DH110266_MyStore.Controllers
                     };
 
                     db.OrderDetails.Add(detail);
+
+                    // Trừ số lượng tồn kho
+                    product.Quantity -= item.Quantity;
                 }
 
                 db.SaveChanges();
+
+                // Xác nhận giao dịch khi lưu đơn hàng và trừ kho thành công
+                transaction.Commit();
 
                 // Chỉ xóa những sản phẩm đã thanh toán
                 cart.RemoveAll(x => selectedIds.Contains(x.ProductID));

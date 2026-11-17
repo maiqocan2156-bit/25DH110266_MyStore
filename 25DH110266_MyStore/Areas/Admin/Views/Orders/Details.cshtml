@@ -27,6 +27,9 @@
             <dt>Trạng thái thanh toán</dt>
             <dd>@Model.PaymentStatus</dd>
 
+            <dt>Trạng thái đơn hàng</dt>
+            <dd>@Model.OrderStatus</dd>
+
             <dt>Địa chỉ giao hàng</dt>
             <dd>@Model.AddressDelivery</dd>
 
@@ -40,14 +43,7 @@
                     : "Chưa có thông tin")
             </dd>
 
-            @if (Model.Customer != null)
-            {
-                <dt>Số điện thoại</dt>
-                <dd>@Model.Customer.CustomerPhone</dd>
-
-                <dt>Email</dt>
-                <dd>@Model.Customer.CustomerEmail</dd>
-            }
+            @Html.Partial("_OrderDetailsList", Model.OrderDetails)
         </dl>
     </div>
 </div>
@@ -93,8 +89,9 @@
                             <td>@detail.Quantity</td>
                             <td>@detail.UnitPrice.ToString("N0") VNĐ</td>
                             <td>
-                                @((detail.Quantity * detail.UnitPrice)
-                                    .ToString("N0")) VNĐ
+                                @(detail.TotalPrice.HasValue 
+                                ? detail.TotalPrice.Value.ToString("N0")   
+                                : "0") VNĐ
                             </td>
                         </tr>
 
@@ -111,9 +108,9 @@
 </div>
 
 <p>
-    @Html.ActionLink("Chỉnh sửa", "Edit",
+    @Html.ActionLink("Cập nhật trạng thái", "UpdateStatus",
         new { id = Model.OrderID },
-        new { @class = "btn btn-warning" })
+        new { @class = "btn btn-primary" })
 
     @Html.ActionLink("Quay lại danh sách", "Index",
         null,

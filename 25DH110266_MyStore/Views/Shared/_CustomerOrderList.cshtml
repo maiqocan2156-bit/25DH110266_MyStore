@@ -1,0 +1,37 @@
+﻿
+@model IEnumerable<_25DH110266_MyStore.Models.Order>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Mã đơn hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái đơn hàng</th>
+                    <th>Trạng thái thanh toán</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.OrderByDescending(o => o.OrderDate))
+                {
+                    <tr>
+                        <td>#@order.OrderID</td>
+                        <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@order.TotalAmount.ToString("N0") VNĐ</td>
+                        <td>@order.OrderStatus</td>
+                        <td>@order.PaymentStatus</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        Khách hàng chưa có đơn hàng nào.
+    </div>
+}

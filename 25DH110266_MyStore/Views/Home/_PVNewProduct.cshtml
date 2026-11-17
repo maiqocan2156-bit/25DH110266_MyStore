@@ -1,6 +1,18 @@
 ﻿
 @model PagedList.IPagedList<_25DH110266_MyStore.Models.Product>
 
+<div class="mb-3">
+    <label>Sắp xếp theo giá:</label>
+
+    <select class="form-control"
+            style="width:200px; display:inline-block;"
+            onchange="var url='@Url.Action("Index", "Home")'; var params=new URLSearchParams(window.location.search); params.set('sortOrder', this.value); params.delete('page'); window.location.href=url+'?'+params.toString();"
+        <option value="" @(ViewBag.SortOrder == null || ViewBag.SortOrder == "" ? "selected" : "")>Mặc định</option>
+        <option value="price_asc" @(ViewBag.SortOrder == "price_asc" ? "selected" : "")>Giá tăng dần</option>
+        <option value="price_desc" @(ViewBag.SortOrder == "price_desc" ? "selected" : "")>Giá giảm dần</option>
+    </select>
+</div>
+
 <div class="row">
     @if (Model != null && Model.Any())
     {
@@ -18,23 +30,23 @@
                              onerror="this.style.display='none';" />
                     }
 
-                <div class="card-body">
-                    <h5 class="card-title">@item.ProductName</h5>
+                    <div class="card-body">
+                        <h5 class="card-title">@item.ProductName</h5>
 
-                    <p class="card-text">
-                        @item.ProductDescription
-                    </p>
+                        <p class="card-text">
+                            @item.ProductDescription
+                        </p>
 
-                    <p class="text-danger font-weight-bold">
-                        @String.Format("{0:N0} đ", item.ProductPrice)
-                    </p>
+                        <p class="text-danger font-weight-bold">
+                            @String.Format("{0:N0} đ", item.ProductPrice)
+                        </p>
 
-                    <a href="@Url.Action("ProductDetail", "Home",
+                        <a href="@Url.Action("ProductDetail", "Home",
                         new { id = item.ProductID })"
-                       class="btn btn-primary">
-                        Xem chi tiết
-                    </a>
-                </div>
+                           class="btn btn-primary">
+                            Xem chi tiết
+                        </a>
+                    </div>
                 </div>
             </div>
         }
@@ -52,7 +64,8 @@
         {
             <a href="@Url.Action("Index", new {
                 page = Model.PageNumber - 1,
-                searchTearm = Request.QueryString["searchTearm"]
+                searchTearm = ViewBag.SearchTerm,
+                sortOrder = ViewBag.SortOrder
             })">Trước</a>
         }
 
@@ -60,7 +73,8 @@
         {
             <a href="@Url.Action("Index", new {
                 page = i,
-                searchTearm = Request.QueryString["searchTearm"]
+                searchTearm = ViewBag.SearchTerm,
+                sortOrder = ViewBag.SortOrder
             })"
                style="margin: 5px; @(i == Model.PageNumber ? "font-weight:bold;" : "")">
                 @i
@@ -71,7 +85,8 @@
         {
             <a href="@Url.Action("Index", new {
                 page = Model.PageNumber + 1,
-                searchTearm = Request.QueryString["searchTearm"]
+                searchTearm = ViewBag.SearchTerm,
+                sortOrder = ViewBag.SortOrder
             })">Tiếp</a>
         }
     </div>
