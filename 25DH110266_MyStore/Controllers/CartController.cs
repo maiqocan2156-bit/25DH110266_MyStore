@@ -134,7 +134,9 @@ namespace _25DH110266_MyStore.Controllers
             int[] selectedProductIds,
             string deliveryMethod,
             string paymentMethod,
-            string addressDelivery)
+            string addressDelivery,
+            string bankName = null,
+            string onlineMethod = null)
         {
             // Kiểm tra đăng nhập
             if (Session["CustomerID"] == null)
@@ -170,6 +172,29 @@ namespace _25DH110266_MyStore.Controllers
             {
                 TempData["Error"] = "Sản phẩm được chọn không hợp lệ.";
                 return RedirectToAction("Index");
+            }
+
+            // Nếu chọn chuyển khoản ngân hàng
+            // thì chuyển sang trang chọn ngân hàng
+            if (paymentMethod == "Chuyển khoản ngân hàng"
+                && string.IsNullOrWhiteSpace(bankName))
+            {
+                ViewBag.SelectedProductIds = selectedIds;
+                ViewBag.DeliveryMethod = deliveryMethod;
+                ViewBag.AddressDelivery = addressDelivery;
+
+                return View("SelectBank", selectedItems);
+            }
+
+            // Nếu chọn thanh toán trực tuyến
+            if (paymentMethod == "Thanh toán trực tuyến"
+                && string.IsNullOrWhiteSpace(onlineMethod))
+            {
+                ViewBag.SelectedProductIds = selectedIds;
+                ViewBag.DeliveryMethod = deliveryMethod;
+                ViewBag.AddressDelivery = addressDelivery;
+
+                return View("OnlinePayment");
             }
 
             int customerId = (int)Session["CustomerID"];
@@ -225,7 +250,12 @@ namespace _25DH110266_MyStore.Controllers
                         : addressDelivery,
 
                     DeliveryMethod = deliveryMethod,
-                    PaymentMethod = paymentMethod
+
+                    PaymentMethod = !string.IsNullOrWhiteSpace(bankName)
+                        ? paymentMethod + " - " + bankName
+                        : !string.IsNullOrWhiteSpace(onlineMethod)
+                            ? paymentMethod + " - " + onlineMethod
+                            : paymentMethod
                 };
 
                 db.Orders.Add(order);

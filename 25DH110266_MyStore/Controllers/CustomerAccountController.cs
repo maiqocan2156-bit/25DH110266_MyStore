@@ -430,20 +430,12 @@ namespace _25DH110266_MyStore.Controllers
 
             if (item != null)
             {
-                // Kiểm tra tổng số lượng sau khi thêm
-                if (item.Quantity + 1 > product.Quantity)
-                {
-                    TempData["Error"] =
-                        "Số lượng vượt quá tồn kho! Hiện chỉ còn "
-                        + product.Quantity + " sản phẩm.";
-
-                    return RedirectToAction("MyOrder");
-                }
-
-                item.Quantity += 1;
+                // Nếu sản phẩm đã có trong giỏ thì đặt số lượng bằng 1
+                item.Quantity = 1;
             }
             else
             {
+                // Nếu chưa có thì thêm mới với số lượng bằng 1
                 cart.Add(new CartItem
                 {
                     ProductID = product.ProductID,

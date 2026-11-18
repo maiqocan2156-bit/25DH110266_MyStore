@@ -1,0 +1,127 @@
+﻿
+@model List<_25DH110266_MyStore.Models.ViewModel.CartItem>
+
+@{
+    ViewBag.Title = "Chọn ngân hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2>Chọn ngân hàng thanh toán</h2>
+    <p>Vui lòng chọn ngân hàng bạn muốn sử dụng để chuyển khoản.</p>
+
+    <div class="card p-4">
+        <h4>Thông tin đơn hàng</h4>
+        <p>Số sản phẩm: @Model.Count</p>
+        <p>
+            Tổng tiền:
+            <strong>@Model.Sum(x => x.Total).ToString("N0") VNĐ</strong>
+        </p>
+
+        <hr />
+
+        @using (Html.BeginForm("Checkout", "Cart", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            foreach (var id in (List<int>)ViewBag.SelectedProductIds)
+            {
+                <input type="hidden" name="selectedProductIds" value="@id" />
+            }
+
+            <input type="hidden" name="deliveryMethod"
+                   value="@ViewBag.DeliveryMethod" />
+
+            <input type="hidden" name="addressDelivery"
+                   value="@ViewBag.AddressDelivery" />
+
+            <input type="hidden" name="paymentMethod"
+                   value="Chuyển khoản ngân hàng" />
+
+            <h5>Ngân hàng</h5>
+
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="bankName"
+                           value="Vietcombank" required />
+                    Vietcombank
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="bankName"
+                           value="BIDV" />
+                    BIDV
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="bankName"
+                           value="VietinBank" />
+                    VietinBank
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="bankName"
+                           value="MB Bank" />
+                    MB Bank
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="bankName"
+                           value="Techcombank" />
+                    Techcombank
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="bankName"
+                           value="ACB" />
+                    ACB
+                </label>
+            </div>
+
+            <hr />
+
+            <hr />
+
+            <div class="text-center mt-4">
+                <h4>Quét mã QR thanh toán</h4>
+
+                <p>Ngân hàng đã chọn: <strong id="selectedBank">Chưa chọn</strong></p>
+
+                <img id="qrCode"
+                     src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=MyStore-Demo-Payment"
+                     alt="QR thanh toán minh họa"
+                     style="width:250px; height:250px; border:1px solid #ddd; padding:10px;" />
+
+                <p class="text-muted mt-2">
+                    Đây là mã QR minh họa, không dùng để chuyển tiền thật.
+                </p>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">
+                Xác nhận ngân hàng
+            </button>
+
+            <a href="@Url.Action("Index", "Cart")"
+               class="btn btn-secondary">
+                Quay lại giỏ hàng
+            </a>
+        }
+    </div>
+
+    <script>document.querySelectorAll('input[name="bankName"]').forEach(function (item) {
+        item.addEventListener('change', function () {
+            document.getElementById('selectedBank').innerText = this.value;
+        });
+    });</script>
+
+</div>

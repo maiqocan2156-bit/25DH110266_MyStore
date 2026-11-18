@@ -323,6 +323,8 @@
     <Content Include="Views\Shared\_CategoryMenu.cshtml" />
     <Content Include="Views\Shared\_OrderDetailsList.cshtml" />
     <Content Include="Views\Shared\_CustomerOrderList.cshtml" />
+    <Content Include="Views\Cart\SelectBank.cshtml" />
+    <Content Include="Views\Cart\OnlinePayment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
